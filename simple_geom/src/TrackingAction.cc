@@ -47,7 +47,17 @@ TrackingAction::TrackingAction(simple_geom_DetectorConstruction* det)
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void TrackingAction::PreUserTrackingAction(const G4Track*)
-{ }
+{
+    // Check if this is a neutron
+
+    // check if it's mother was neutron
+
+    // if it was, find how many other neutrons produced, if one or if
+    // more than one and is the largest energy, don't count (it's
+    // simply considered to be the same neutron)
+
+    // count the neutron and record its initial energy
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
