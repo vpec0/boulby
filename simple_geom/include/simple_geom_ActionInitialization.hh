@@ -32,20 +32,26 @@
 
 #include "G4VUserActionInitialization.hh"
 
+class simple_geom_DetectorConstruction;
+
+class AnaManager;
+
 /// Action initialization class.
 
 class simple_geom_ActionInitialization : public G4VUserActionInitialization
 {
   public:
-    simple_geom_ActionInitialization();
+    simple_geom_ActionInitialization(simple_geom_DetectorConstruction*, AnaManager*);
     virtual ~simple_geom_ActionInitialization();
 
     virtual void BuildForMaster() const;
     virtual void Build() const;
+
+private:
+    AnaManager* mAnaM;
+    simple_geom_DetectorConstruction* mDetConst;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
-
-    

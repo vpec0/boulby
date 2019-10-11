@@ -34,6 +34,7 @@
 #include "globals.hh"
 
 class simple_geom_RunAction;
+class AnaManager;
 
 /// Event action class
 ///
@@ -41,7 +42,7 @@ class simple_geom_RunAction;
 class simple_geom_EventAction : public G4UserEventAction
 {
   public:
-    simple_geom_EventAction(simple_geom_RunAction* runAction);
+    simple_geom_EventAction(simple_geom_RunAction* runAction, AnaManager*);
     virtual ~simple_geom_EventAction();
 
     virtual void BeginOfEventAction(const G4Event* event);
@@ -52,10 +53,9 @@ class simple_geom_EventAction : public G4UserEventAction
   private:
     simple_geom_RunAction* fRunAction;
     G4double     fEdep;
+    AnaManager* mAnaM;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
-
-    

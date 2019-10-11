@@ -33,6 +33,8 @@
 #include "G4UserTrackingAction.hh"
 #include "globals.hh"
 
+#include "AnaManager.hh"
+
 class simple_geom_DetectorConstruction;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -40,7 +42,7 @@ class simple_geom_DetectorConstruction;
 class TrackingAction : public G4UserTrackingAction {
 
   public:
-    TrackingAction(simple_geom_DetectorConstruction*);
+    TrackingAction(simple_geom_DetectorConstruction*, AnaManager*);
 
    ~TrackingAction() {};
 
@@ -49,6 +51,7 @@ class TrackingAction : public G4UserTrackingAction {
 
   private:
     simple_geom_DetectorConstruction*   detector;
+    AnaManager* mAnaM;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

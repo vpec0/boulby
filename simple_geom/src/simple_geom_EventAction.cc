@@ -33,13 +33,16 @@
 #include "G4Event.hh"
 #include "G4RunManager.hh"
 
+#include "AnaManager.hh"
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-simple_geom_EventAction::simple_geom_EventAction(simple_geom_RunAction* runAction)
+simple_geom_EventAction::simple_geom_EventAction(simple_geom_RunAction* runAction, AnaManager* anam)
 : G4UserEventAction(),
   fRunAction(runAction),
-  fEdep(0.)
-{} 
+  fEdep(0.),
+  mAnaM(anam)
+{}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -48,17 +51,22 @@ simple_geom_EventAction::~simple_geom_EventAction()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void simple_geom_EventAction::BeginOfEventAction(const G4Event*)
-{    
+void simple_geom_EventAction::BeginOfEventAction(const G4Event* evt)
+{
   fEdep = 0.;
+  mAnaM->Reset();
+  mAnaM->mEvent.runNo = fRunAction->mRunID;
+  mAnaM->mEvent.eventNo = evt->GetEventID();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void simple_geom_EventAction::EndOfEventAction(const G4Event*)
-{   
+{
   // accumulate statistics in run action
   fRunAction->AddEdep(fEdep);
+  if (mAnaM->mEvent.n_neutrons > 0)
+      mAnaM -> FillTree();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

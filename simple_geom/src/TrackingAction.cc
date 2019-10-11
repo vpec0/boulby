@@ -40,15 +40,17 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-TrackingAction::TrackingAction(simple_geom_DetectorConstruction* det)
-:G4UserTrackingAction(),detector(det)
+TrackingAction::TrackingAction(simple_geom_DetectorConstruction* det, AnaManager* anam)
+    :G4UserTrackingAction(),detector(det), mAnaM(anam)
 { }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void TrackingAction::PreUserTrackingAction(const G4Track*)
+void TrackingAction::PreUserTrackingAction(const G4Track* trk)
 {
     // Check if this is a neutron
+    if (trk->GetParticleDefinition()->GetPDGEncoding() != 2112) return;
+    if (mAnaM->mEvent.n_neutrons >= MAX_NEUTRONS) return;
 
     // check if it's mother was neutron
 
@@ -57,6 +59,11 @@ void TrackingAction::PreUserTrackingAction(const G4Track*)
     // simply considered to be the same neutron)
 
     // count the neutron and record its initial energy
+    mAnaM->mEvent.n_energy[mAnaM->mEvent.n_neutrons] = trk->GetKineticEnergy() / CLHEP::MeV;
+    mAnaM->mEvent.n_start_xyz[mAnaM->mEvent.n_neutrons][0] = trk->GetVertexPosition().getX()/CLHEP::cm;
+    mAnaM->mEvent.n_start_xyz[mAnaM->mEvent.n_neutrons][1] = trk->GetVertexPosition().getY()/CLHEP::cm;
+    mAnaM->mEvent.n_start_xyz[mAnaM->mEvent.n_neutrons][2] = trk->GetVertexPosition().getZ()/CLHEP::cm;
+    mAnaM->mEvent.n_neutrons++;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

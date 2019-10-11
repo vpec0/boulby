@@ -40,29 +40,33 @@
 #include "G4UnitsTable.hh"
 #include "G4SystemOfUnits.hh"
 
+#include "AnaManager.hh"
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-simple_geom_RunAction::simple_geom_RunAction()
+simple_geom_RunAction::simple_geom_RunAction(AnaManager* anam)
 : G4UserRunAction(),
   fEdep(0.),
-  fEdep2(0.)
-{ 
+  fEdep2(0.),
+  mAnaM(anam),
+  mRunID(0)
+{
   // add new units for dose
-  // 
+  //
   const G4double milligray = 1.e-3*gray;
   const G4double microgray = 1.e-6*gray;
-  const G4double nanogray  = 1.e-9*gray;  
+  const G4double nanogray  = 1.e-9*gray;
   const G4double picogray  = 1.e-12*gray;
-   
+
   new G4UnitDefinition("milligray", "milliGy" , "Dose", milligray);
   new G4UnitDefinition("microgray", "microGy" , "Dose", microgray);
   new G4UnitDefinition("nanogray" , "nanoGy"  , "Dose", nanogray);
-  new G4UnitDefinition("picogray" , "picoGy"  , "Dose", picogray); 
+  new G4UnitDefinition("picogray" , "picoGy"  , "Dose", picogray);
 
   // Register accumulable to the accumulable manager
   G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
   accumulableManager->RegisterAccumulable(fEdep);
-  accumulableManager->RegisterAccumulable(fEdep2); 
+  accumulableManager->RegisterAccumulable(fEdep2);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -72,8 +76,8 @@ simple_geom_RunAction::~simple_geom_RunAction()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void simple_geom_RunAction::BeginOfRunAction(const G4Run*)
-{ 
+void simple_geom_RunAction::BeginOfRunAction(const G4Run* run)
+{
   // inform the runManager to save random number seed
   G4RunManager::GetRunManager()->SetRandomNumberStore(false);
 
@@ -81,6 +85,8 @@ void simple_geom_RunAction::BeginOfRunAction(const G4Run*)
   G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
   accumulableManager->Reset();
 
+  mRunID = run->GetRunID();
+  mAnaM->mEvent.runNo = run->GetRunID();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -90,7 +96,7 @@ void simple_geom_RunAction::EndOfRunAction(const G4Run* run)
   G4int nofEvents = run->GetNumberOfEvent();
   if (nofEvents == 0) return;
 
-  // Merge accumulables 
+  // Merge accumulables
   G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
   accumulableManager->Merge();
 
@@ -98,9 +104,9 @@ void simple_geom_RunAction::EndOfRunAction(const G4Run* run)
   //
   G4double edep  = fEdep.GetValue();
   G4double edep2 = fEdep2.GetValue();
-  
+
   G4double rms = edep2 - edep*edep/nofEvents;
-  if (rms > 0.) rms = std::sqrt(rms); else rms = 0.;  
+  if (rms > 0.) rms = std::sqrt(rms); else rms = 0.;
 
   const simple_geom_DetectorConstruction* detectorConstruction
    = static_cast<const simple_geom_DetectorConstruction*>
@@ -124,9 +130,9 @@ void simple_geom_RunAction::EndOfRunAction(const G4Run* run)
     G4double particleEnergy = particleGun->GetParticleEnergy();
     runCondition += G4BestUnit(particleEnergy,"Energy");
   }
-        
+
   // Print
-  //  
+  //
   if (IsMaster()) {
     G4cout
      << G4endl
@@ -137,12 +143,12 @@ void simple_geom_RunAction::EndOfRunAction(const G4Run* run)
      << G4endl
      << "--------------------End of Local Run------------------------";
   }
-  
+
   G4cout
      << G4endl
      << " The run consists of " << nofEvents << " "<< runCondition
      << G4endl
-     << " Cumulated dose per run, in scoring volume : " 
+     << " Cumulated dose per run, in scoring volume : "
      << G4BestUnit(dose,"Dose") << " rms = " << G4BestUnit(rmsDose,"Dose")
      << G4endl
      << "------------------------------------------------------------"
@@ -160,4 +166,3 @@ void simple_geom_RunAction::AddEdep(G4double edep)
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-

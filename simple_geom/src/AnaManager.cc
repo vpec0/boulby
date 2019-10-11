@@ -44,7 +44,7 @@
 AnaManager::AnaManager()
 :fRootFile(0),
  fTree(0),
- fEabs(0.), fEgap(0.) ,fLabs(0.), fLgap(0.), fEvent()
+ fEabs(0.), fEgap(0.) ,fLabs(0.), fLgap(0.), mEvent()
 {
 
   // histograms
@@ -76,7 +76,7 @@ void AnaManager::Book()
   }
 
   // create 1st ntuple
-  fTree = createTree("events", fEvent);
+  fTree = createTree("events", mEvent);
 
   G4cout << "\n----> Output file is open in " << fileName << G4endl;
 }

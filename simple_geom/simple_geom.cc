@@ -44,6 +44,8 @@
 
 #include "Randomize.hh"
 
+#include "AnaManager.hh"
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 int main(int argc,char** argv)
@@ -69,15 +71,19 @@ int main(int argc,char** argv)
   // Set mandatory initialization classes
   //
   // Detector construction
-  runManager->SetUserInitialization(new simple_geom_DetectorConstruction());
+  simple_geom_DetectorConstruction* detconst = new simple_geom_DetectorConstruction();
+  runManager->SetUserInitialization(detconst);
 
   // Physics list
   G4VModularPhysicsList* physicsList = new Shielding;
   physicsList->SetVerboseLevel(1);
   runManager->SetUserInitialization(physicsList);
 
+
+  AnaManager* anam = new AnaManager();
+  anam->Book();
   // User action initialization
-  runManager->SetUserInitialization(new simple_geom_ActionInitialization());
+  runManager->SetUserInitialization(new simple_geom_ActionInitialization(detconst, anam));
 
   // Initialize visualization
   //
@@ -108,6 +114,9 @@ int main(int argc,char** argv)
   // Free the store: user actions, physics_list and detector_description are
   // owned and deleted by the run manager, so they should not be deleted
   // in the main() program !
+
+  anam->Save();
+
 
   delete visManager;
   delete runManager;

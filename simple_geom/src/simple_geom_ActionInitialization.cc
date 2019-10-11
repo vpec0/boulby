@@ -32,11 +32,17 @@
 #include "simple_geom_RunAction.hh"
 #include "simple_geom_EventAction.hh"
 #include "simple_geom_SteppingAction.hh"
+#include "TrackingAction.hh"
+
+#include "AnaManager.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-simple_geom_ActionInitialization::simple_geom_ActionInitialization()
- : G4VUserActionInitialization()
+simple_geom_ActionInitialization::simple_geom_ActionInitialization(simple_geom_DetectorConstruction* detconst,
+								   AnaManager* anam)
+    : G4VUserActionInitialization(),
+      mDetConst(detconst),
+      mAnaM(anam)
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -48,7 +54,7 @@ simple_geom_ActionInitialization::~simple_geom_ActionInitialization()
 
 void simple_geom_ActionInitialization::BuildForMaster() const
 {
-  simple_geom_RunAction* runAction = new simple_geom_RunAction;
+    simple_geom_RunAction* runAction = new simple_geom_RunAction(mAnaM);
   SetUserAction(runAction);
 }
 
@@ -58,13 +64,16 @@ void simple_geom_ActionInitialization::Build() const
 {
   SetUserAction(new simple_geom_PrimaryGeneratorAction);
 
-  simple_geom_RunAction* runAction = new simple_geom_RunAction;
+  simple_geom_RunAction* runAction = new simple_geom_RunAction (mAnaM);
   SetUserAction(runAction);
-  
-  simple_geom_EventAction* eventAction = new simple_geom_EventAction(runAction);
+
+  simple_geom_EventAction* eventAction = new simple_geom_EventAction(runAction, mAnaM);
   SetUserAction(eventAction);
-  
+
+
+  SetUserAction(new TrackingAction(mDetConst, mAnaM));
+
   SetUserAction(new simple_geom_SteppingAction(eventAction));
-}  
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

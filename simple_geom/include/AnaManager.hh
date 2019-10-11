@@ -60,7 +60,10 @@ class AnaManager
     void FillNtuple(G4double energyAbs, G4double energyGap,
                     G4double trackLAbs, G4double trackLGap);
 
+    void FillTree() {fTree->Fill();};
     void PrintStatistic();
+    void Reset() { mEvent = {}; };
+
 
   private:
     TFile*   fRootFile;
@@ -73,7 +76,8 @@ class AnaManager
     G4double fLabs;
     G4double fLgap;
 
-    Event_t fEvent;
+public:
+    Event_t mEvent;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
