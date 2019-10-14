@@ -50,42 +50,35 @@ void TrackingAction::PreUserTrackingAction(const G4Track* trk)
 {
     // Check if this is a neutron
     if (trk->GetParticleDefinition()->GetPDGEncoding() != 2112) return;
-    if (mAnaM->mEvent.n_neutrons >= MAX_NEUTRONS) return;
 
-    // check if it's mother was neutron
+    // count the neutron and record its initial energy, start
+    // position, end position, creation process, and parent id
+    int n = mAnaM->mEvent.n_neutrons;
+    mAnaM->mEvent.n_energy[n] = trk->GetKineticEnergy() / CLHEP::MeV;
+    mAnaM->mEvent.start_xyz[n][0] = trk->GetVertexPosition().getX()/CLHEP::cm;
+    mAnaM->mEvent.start_xyz[n][1] = trk->GetVertexPosition().getY()/CLHEP::cm;
+    mAnaM->mEvent.start_xyz[n][2] = trk->GetVertexPosition().getZ()/CLHEP::cm;
 
-    // if it was, find how many other neutrons produced, if one or if
-    // more than one and is the largest energy, don't count (it's
-    // simply considered to be the same neutron)
+    mAnaM->mEvent.process.push_back(trk->GetCreatorProcess()->GetProcessName());
+    mAnaM->mEvent.trackId[n] = trk->GetTrackID();
+    mAnaM->mEvent.parentId[n] = trk->GetParentID();
 
-    // count the neutron and record its initial energy
-    mAnaM->mEvent.n_energy[mAnaM->mEvent.n_neutrons] = trk->GetKineticEnergy() / CLHEP::MeV;
-    mAnaM->mEvent.n_start_xyz[mAnaM->mEvent.n_neutrons][0] = trk->GetVertexPosition().getX()/CLHEP::cm;
-    mAnaM->mEvent.n_start_xyz[mAnaM->mEvent.n_neutrons][1] = trk->GetVertexPosition().getY()/CLHEP::cm;
-    mAnaM->mEvent.n_start_xyz[mAnaM->mEvent.n_neutrons][2] = trk->GetVertexPosition().getZ()/CLHEP::cm;
-    mAnaM->mEvent.n_neutrons++;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void TrackingAction::PostUserTrackingAction(const G4Track* track)
+void TrackingAction::PostUserTrackingAction(const G4Track* trk)
 {
-  //compute leakage
-  //
-  // if not at World boundaries, return
-  // if (track->GetVolume() != detector->GetPvolWorld()) return;
+    // Check if this is a neutron
+    if (trk->GetParticleDefinition()->GetPDGEncoding() != 2112) return;
+    int n = mAnaM->mEvent.n_neutrons;
 
-  // //get position
-  // G4double x = (track->GetPosition()).x();
-  // G4double xlimit = 0.5*(detector->GetCalorThickness());
-  // G4int icase = 2;
-  // if (x >= xlimit) icase = 0;
-  // else if (x <= -xlimit) icase = 1;
+    mAnaM->mEvent.end_xyz[n][0] = trk->GetPosition().getX()/CLHEP::cm;
+    mAnaM->mEvent.end_xyz[n][1] = trk->GetPosition().getY()/CLHEP::cm;
+    mAnaM->mEvent.end_xyz[n][2] = trk->GetPosition().getZ()/CLHEP::cm;
 
-  //get particle energy
-  G4double Eleak = track->GetKineticEnergy();
-  if (track->GetDefinition() == G4Positron::Positron())
-     Eleak += 2*electron_mass_c2;
+    mAnaM->mEvent.n_neutrons++;
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

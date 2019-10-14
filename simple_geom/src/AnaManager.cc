@@ -131,6 +131,14 @@ void AnaManager::FillNtuple(G4double energyAbs, G4double energyGap,
   if (fTree) fTree->Fill();
 }
 
+
+void AnaManager::FillTree()
+{
+    // do any event filtering here
+
+    fTree->Fill();
+}
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void AnaManager::PrintStatistic()
@@ -149,6 +157,14 @@ void AnaManager::PrintStatistic()
            << " rms = " << G4BestUnit(h1->GetRMS(), unitCategory )
            << G4endl;
   }
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void AnaManager::Reset()
+{
+    mEvent = {};
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -31,6 +31,8 @@
 #ifndef AnaManager_h
 #define AnaManager_h 1
 
+#include "G4ThreeVector.hh"
+
 #include "globals.hh"
 
 #include "AnaTree.h"
@@ -60,9 +62,9 @@ class AnaManager
     void FillNtuple(G4double energyAbs, G4double energyGap,
                     G4double trackLAbs, G4double trackLGap);
 
-    void FillTree() {fTree->Fill();};
+    void FillTree();
     void PrintStatistic();
-    void Reset() { mEvent = {}; };
+    void Reset();
 
 
   private:
