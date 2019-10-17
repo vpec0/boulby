@@ -41,8 +41,8 @@
 simple_geom_ActionInitialization::simple_geom_ActionInitialization(simple_geom_DetectorConstruction* detconst,
 								   AnaManager* anam)
     : G4VUserActionInitialization(),
-      mDetConst(detconst),
-      mAnaM(anam)
+      mAnaM(anam),
+      mDetConst(detconst)
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
