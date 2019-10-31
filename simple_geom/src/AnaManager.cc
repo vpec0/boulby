@@ -89,6 +89,8 @@ void AnaManager::Book()
 
   // create 1st ntuple
   fTree = createTree("events", mEvent);
+  // have the tree saved every 20kB
+  fTree->SetAutoSafe(-20000);
 
   G4cout << "\n----> Output file is open in " << fFileName << G4endl;
 }
