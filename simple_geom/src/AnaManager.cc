@@ -41,10 +41,23 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-AnaManager::AnaManager()
-:fRootFile(0),
- fTree(0),
- fEabs(0.), fEgap(0.) ,fLabs(0.), fLgap(0.), mEvent()
+AnaManager::AnaManager(const char* filename):
+        fFileName(filename),
+	fRootFile(0),
+	fTree(0),
+	fEabs(0.), fEgap(0.) ,fLabs(0.), fLgap(0.), mEvent()
+{
+
+  // histograms
+  for (G4int k=0; k<kMaxHisto; k++) fHisto[k] = 0;
+
+}
+
+AnaManager::AnaManager():
+    fFileName("simple_geom_anatree.root"),
+    fRootFile(0),
+    fTree(0),
+    fEabs(0.), fEgap(0.) ,fLabs(0.), fLgap(0.), mEvent()
 {
 
   // histograms
@@ -66,8 +79,7 @@ void AnaManager::Book()
   // Creating a tree container to handle histograms and ntuples.
   // This tree is associated to an output file.
   //
-  G4String fileName = "simple_geom_anatree.root";
-  fRootFile = new TFile(fileName,"RECREATE");
+  fRootFile = new TFile(fFileName,"RECREATE");
   if (! fRootFile) {
     G4cout << " AnaManager::Book :"
            << " problem creating the ROOT TFile "
@@ -78,7 +90,7 @@ void AnaManager::Book()
   // create 1st ntuple
   fTree = createTree("events", mEvent);
 
-  G4cout << "\n----> Output file is open in " << fileName << G4endl;
+  G4cout << "\n----> Output file is open in " << fFileName << G4endl;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

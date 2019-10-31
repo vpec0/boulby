@@ -49,11 +49,15 @@ class simple_geom_EventAction : public G4UserEventAction
     virtual void EndOfEventAction(const G4Event* event);
 
     void AddEdep(G4double edep) { fEdep += edep; }
+    void SetRunVerboseLevel(G4int level) { fRunVerboseLevel = level; };
+
 
   private:
     simple_geom_RunAction* fRunAction;
     G4double     fEdep;
     AnaManager* mAnaM;
+
+    G4int fRunVerboseLevel;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

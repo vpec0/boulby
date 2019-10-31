@@ -30,6 +30,7 @@
 #include "simple_geom_DetectorConstruction.hh"
 #include "simple_geom_ActionInitialization.hh"
 
+#undef G4MULTITHREADED
 #ifdef G4MULTITHREADED
 #include "G4MTRunManager.hh"
 #else
@@ -79,18 +80,24 @@ int main(int argc,char** argv)
   physicsList->SetVerboseLevel(1);
   runManager->SetUserInitialization(physicsList);
 
+  TString outfname("");
+  AnaManager* anam = 0;
+  if (argc>2) {
+      outfname = argv[2];
+      anam = new AnaManager(outfname);
+  } else
+      anam = new AnaManager();
 
-  AnaManager* anam = new AnaManager();
   anam->Book();
   // User action initialization
   runManager->SetUserInitialization(new simple_geom_ActionInitialization(detconst, anam));
 
   // Initialize visualization
   //
-  G4VisManager* visManager = new G4VisExecutive;
+  // G4VisManager* visManager = new G4VisExecutive;
   // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
   // G4VisManager* visManager = new G4VisExecutive("Quiet");
-  visManager->Initialize();
+  // visManager->Initialize();
 
   // Get the pointer to the User Interface manager
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
@@ -118,7 +125,7 @@ int main(int argc,char** argv)
   anam->Save();
 
 
-  delete visManager;
+  //delete visManager;
   delete runManager;
 }
 

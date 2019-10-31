@@ -42,7 +42,10 @@ simple_geom_EventAction::simple_geom_EventAction(simple_geom_RunAction* runActio
   fRunAction(runAction),
   fEdep(0.),
   mAnaM(anam)
-{}
+{
+    fRunVerboseLevel = G4RunManager::GetRunManager()->GetVerboseLevel();
+    G4cout<<"EventAction: Setting Run Verbose Level to: "<<fRunVerboseLevel<<G4endl;
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -53,6 +56,15 @@ simple_geom_EventAction::~simple_geom_EventAction()
 
 void simple_geom_EventAction::BeginOfEventAction(const G4Event* evt)
 {
+    // if (evt->GetEventID() == 0) {
+    // 	fRunVerboseLevel = G4RunManager::GetRunManager()->GetVerboseLevel();
+    // }
+
+    // if (fRunVerboseLevel>1) {
+    // 	G4cout<<"Starting event number "<<evt->GetEventID()<<G4endl;
+    // }
+    //G4RunManager::GetRunManager()->RestoreRandomNumberStatus("currentEvent.rndm");
+
   fEdep = 0.;
   mAnaM->Reset();
   mAnaM->mEvent.runNo = fRunAction->mRunID;

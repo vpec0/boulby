@@ -6,7 +6,7 @@
 
 #include "TTree.h"
 
-const int MAX_NEUTRONS = 400;
+const int MAX_NEUTRONS = 800;
 
 struct Event_t;
 TTree* createTree(const char* tree_name, Event_t& event);

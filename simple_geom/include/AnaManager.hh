@@ -51,6 +51,7 @@ class AnaManager
 {
   public:
     AnaManager();
+    AnaManager(const char*);
    ~AnaManager();
 
     void Book();
@@ -68,6 +69,7 @@ class AnaManager
 
 
   private:
+    TString  fFileName;
     TFile*   fRootFile;
     TH1D*    fHisto[kMaxHisto];
     TTree*   fTree;

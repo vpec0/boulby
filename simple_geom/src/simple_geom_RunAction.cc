@@ -44,6 +44,8 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+class simple_geom_EventAction;
+
 simple_geom_RunAction::simple_geom_RunAction(AnaManager* anam)
 : G4UserRunAction(),
   fEdep(0.),
@@ -80,6 +82,7 @@ void simple_geom_RunAction::BeginOfRunAction(const G4Run* run)
 {
   // inform the runManager to save random number seed
   G4RunManager::GetRunManager()->SetRandomNumberStore(false);
+  //G4RunManager::GetRunManager()->RestoreRandomNumberStatus("currentRun.rndm");
 
   // reset accumulables to their initial values
   G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
