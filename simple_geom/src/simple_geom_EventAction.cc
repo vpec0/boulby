@@ -66,8 +66,9 @@ void simple_geom_EventAction::BeginOfEventAction(const G4Event* evt)
     //std::cout<<"Current event seeds: "<<s[0]<<", "<<s[1]<<std::endl;
     unsigned runId = G4RunManager::GetRunManager()->GetCurrentRun()->GetRunID();
     unsigned evtId = evt->GetEventID();
-    unsigned long cantor0 = (((seeds[0] + evtId + runId)*(seeds[0] + evtId+runId))>>1) + seeds[0];
-    unsigned long cantor1 = (((seeds[1] + evtId + runId)*(seeds[1] + evtId+runId))>>1) + seeds[1];
+    unsigned long hash = (runId << 16) | (evtId & 0xffff);
+    unsigned long cantor0 = (((seeds[0] + hash)*(seeds[0] + hash))>>1) + seeds[0];
+    unsigned long cantor1 = (((seeds[1] + hash)*(seeds[1] + hash))>>1) + seeds[1];
     // std::cout<<"runId: "<<runId<<", evtId:" <<evtId
     // 	     <<", cantor0: "<<cantor0<<", cantor1: "<<cantor1<<std::endl;
     seeds[0] = cantor0>>2;
