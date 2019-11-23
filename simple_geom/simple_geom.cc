@@ -51,6 +51,7 @@
 
 int main(int argc,char** argv)
 {
+  std::cout<<">>> simple_geom: begin."<<std::endl;
   // Detect interactive mode (if no arguments) and define UI session
   //
   G4UIExecutive* ui = 0;
@@ -58,8 +59,15 @@ int main(int argc,char** argv)
     ui = new G4UIExecutive(argc, argv);
   }
 
+  std::cout<<">>> simple_geom: deal with random number settings..."<<std::endl;
   // Choose the Random engine
   G4Random::setTheEngine(new CLHEP::RanecuEngine);
+  G4Random::showEngineStatus();
+  int startRun = 2000010;
+  if (argc>3)
+      sscanf(argv[3], "%d", &startRun);
+  std::cout<<">>> simple_geom: Will use "<<startRun<<" start number in run sequence."<<std::endl;
+
 
   // Construct the default run manager
   //
@@ -68,6 +76,9 @@ int main(int argc,char** argv)
 #else
   G4RunManager* runManager = new G4RunManager;
 #endif
+
+
+  runManager->SetRunIDCounter(startRun);
 
   // Set mandatory initialization classes
   //
@@ -89,6 +100,7 @@ int main(int argc,char** argv)
       anam = new AnaManager();
 
   anam->Book();
+
   // User action initialization
   runManager->SetUserInitialization(new simple_geom_ActionInitialization(detconst, anam));
 
@@ -124,9 +136,12 @@ int main(int argc,char** argv)
 
   anam->Save();
 
-
+  delete anam;
   //delete visManager;
   delete runManager;
+  std::cout<<">>> simple_geom: end."<<std::endl;
+
+  return 0;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....

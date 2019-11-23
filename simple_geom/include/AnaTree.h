@@ -90,5 +90,5 @@ void resetEvent(Event_t& evt) {
 
 
 #endif // ANATREE_CXX
-}; // namespace AnaTree
+} // namespace AnaTree
 #endif // ANATREE_H

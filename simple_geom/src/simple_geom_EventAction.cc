@@ -32,6 +32,7 @@
 
 #include "G4Event.hh"
 #include "G4RunManager.hh"
+#include "G4Run.hh"
 
 #include "AnaManager.hh"
 
@@ -56,6 +57,29 @@ simple_geom_EventAction::~simple_geom_EventAction()
 
 void simple_geom_EventAction::BeginOfEventAction(const G4Event* evt)
 {
+
+    // Set current random number seeds based on the current run and event
+    long seeds[200] = {};
+    G4Random::getTheTableSeeds(seeds, 0);
+    //std::cout<<"Original seeds from the table: "<<seeds[0]<<", "<<seeds[1]<<std::endl;
+    const long* s = G4Random::getTheSeeds();
+    //std::cout<<"Current event seeds: "<<s[0]<<", "<<s[1]<<std::endl;
+    unsigned runId = G4RunManager::GetRunManager()->GetCurrentRun()->GetRunID();
+    unsigned evtId = evt->GetEventID();
+    unsigned long cantor0 = (((seeds[0] + evtId + runId)*(seeds[0] + evtId+runId))>>1) + seeds[0];
+    unsigned long cantor1 = (((seeds[1] + evtId + runId)*(seeds[1] + evtId+runId))>>1) + seeds[1];
+    // std::cout<<"runId: "<<runId<<", evtId:" <<evtId
+    // 	     <<", cantor0: "<<cantor0<<", cantor1: "<<cantor1<<std::endl;
+    seeds[0] = cantor0>>2;
+    seeds[1] = cantor1>>2;
+    std::cout<<"Prepared seeds: "<<seeds[0]<<", "<<seeds[1]<<", "<<seeds[2]<<std::endl;
+    G4Random::setTheSeeds(seeds);
+
+    s = G4Random::getTheSeeds();
+    std::cout<<"Current event seeds: "<<s[0]<<", "<<s[1]<<std::endl;
+    // std::cout<<"Compared to: "<<seeds[0]<<", "<<seeds[1]<<std::endl;
+
+
     // if (evt->GetEventID() == 0) {
     // 	fRunVerboseLevel = G4RunManager::GetRunManager()->GetVerboseLevel();
     // }

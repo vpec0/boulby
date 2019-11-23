@@ -81,7 +81,7 @@ class AnaManager
     G4double fLgap;
 
 public:
-    Event_t mEvent;
+    AnaTree::Event_t mEvent;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
