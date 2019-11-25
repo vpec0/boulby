@@ -1,0 +1,25 @@
+Energy			= 280
+NEvents			= 10000
+RunNo			= ( 20200 + $(Process) )
+Material		= plastic_sc
+executable		= simple_geom.sh
+arguments		= $(Charge) $(Energy) $(Material) $INT(RunNo) $(NEvents)
+LogDir			= logs/$(Material)/$(Charge)/$(Energy)
+log			= $(LogDir)/simple_geom_$(Charge)_$(Energy)_GeV_$INT(RunNo).log
+#Output			= $(LogDir)/sim_$INT(RunNo).out
+#Error			= $(LogDir)/sim_$INT(RunNo).err
+
+
+#should_transfer_files	= YES
+#Initialdir		= ../data/$(Material)/$(Charge)/$(Energy)/$INT(RunNo)
+#when_to_transfer_output = ON_EXIT_OR_EVICT
+
+#DataDir			= ../data/$(Material)/$(Charge)/$(Energy)/$INT(RunNo)
+#transfer_output_remaps	= "$(Output)=$(DataDir)/$(Output);$(Error)=$(DataDir)/$(Error);sim.root=$(DataDir)/sim.root"
+#transfer_output_remaps	= "sim.root=$(DataDir)/sim.root"
+
+queue 10 Charge Energy from ( muminus 240
+      muminus 320
+      muplus 240
+      muplus 320
+)
