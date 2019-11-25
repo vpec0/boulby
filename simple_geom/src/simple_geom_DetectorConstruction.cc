@@ -136,7 +136,8 @@ G4VPhysicalVolume* simple_geom_DetectorConstruction::Construct()
     new G4Box("Box",
 	      0.5*box_sizeXY, 0.5*box_sizeXY, 0.5*box_sizeZ);
 
-  G4Material* box_mat = nist->FindOrBuildMaterial("G4_PLASTIC_SC_VINYLTOLUENE");
+  //G4Material* box_mat = nist->FindOrBuildMaterial("G4_PLASTIC_SC_VINYLTOLUENE");
+  G4Material* box_mat = nist->FindOrBuildMaterial("G4_POLYETHYLENE");
   G4ThreeVector pos1 = G4ThreeVector();
 
   G4LogicalVolume* logicBox =
