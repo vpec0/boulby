@@ -51,6 +51,18 @@ void TrackingAction::PreUserTrackingAction(const G4Track* trk)
     // Check if this is a neutron
     if (trk->GetParticleDefinition()->GetPDGEncoding() != 2112) return;
 
+    if ( mAnaM->mEvent.n_neutrons >= AnaTree::MAX_NEUTRONS ) {
+	// we don't have enough capacity allocated to store more
+	// print out a warning message and don't record the neutron
+	std::cerr<<"WARNING: TrackingAction::PreUserTrackingAction(): "
+		 <<"reached a hardcoded limit of neutrons to be stored: "
+		 << AnaTree::MAX_NEUTRONS << std::endl
+		 <<"         Will not store any more neutrons in this event ("
+		 <<mAnaM->mEvent.runNo<<", "
+		 <<mAnaM->mEvent.eventNo<<")." << std::endl;
+	return;
+    }
+
     // count the neutron and record its initial energy, start
     // position, end position, creation process, and parent id
     int n = mAnaM->mEvent.n_neutrons;
@@ -71,6 +83,12 @@ void TrackingAction::PostUserTrackingAction(const G4Track* trk)
 {
     // Check if this is a neutron
     if (trk->GetParticleDefinition()->GetPDGEncoding() != 2112) return;
+    if ( mAnaM->mEvent.n_neutrons >= AnaTree::MAX_NEUTRONS ) {
+	// we don't have enough capacity allocated to store more
+	return;
+    }
+
+
     int n = mAnaM->mEvent.n_neutrons;
 
     mAnaM->mEvent.end_xyz[n][0] = trk->GetPosition().getX()/CLHEP::cm;

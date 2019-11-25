@@ -62,10 +62,14 @@ void simple_geom_EventAction::BeginOfEventAction(const G4Event* evt)
     long seeds[200] = {};
     G4Random::getTheTableSeeds(seeds, 0);
     //std::cout<<"Original seeds from the table: "<<seeds[0]<<", "<<seeds[1]<<std::endl;
-    const long* s = G4Random::getTheSeeds();
-    //std::cout<<"Current event seeds: "<<s[0]<<", "<<s[1]<<std::endl;
+    // const long* s = G4Random::getTheSeeds();
+    // std::cout<<"Original event seeds: "<<s[0]<<", "<<s[1]<<std::endl;
     unsigned runId = G4RunManager::GetRunManager()->GetCurrentRun()->GetRunID();
     unsigned evtId = evt->GetEventID();
+    /// Temporary debugging vvvvvvvvvvvvvvvvvvvv
+    // runId = 20000;
+    // evtId = 7452;
+    /// end of temporary debugging ^^^^^^^^^^
     unsigned long hash = (runId << 16) | (evtId & 0xffff);
     unsigned long cantor0 = (((seeds[0] + hash)*(seeds[0] + hash))>>1) + seeds[0];
     unsigned long cantor1 = (((seeds[1] + hash)*(seeds[1] + hash))>>1) + seeds[1];
@@ -73,11 +77,11 @@ void simple_geom_EventAction::BeginOfEventAction(const G4Event* evt)
     // 	     <<", cantor0: "<<cantor0<<", cantor1: "<<cantor1<<std::endl;
     seeds[0] = cantor0>>2;
     seeds[1] = cantor1>>2;
-    std::cout<<"Prepared seeds: "<<seeds[0]<<", "<<seeds[1]<<", "<<seeds[2]<<std::endl;
+    // std::cout<<"Prepared seeds: "<<seeds[0]<<", "<<seeds[1]<<", "<<seeds[2]<<std::endl;
     G4Random::setTheSeeds(seeds);
 
-    s = G4Random::getTheSeeds();
-    std::cout<<"Current event seeds: "<<s[0]<<", "<<s[1]<<std::endl;
+    // s = G4Random::getTheSeeds();
+    // std::cout<<"Current event seeds: "<<s[0]<<", "<<s[1]<<std::endl;
     // std::cout<<"Compared to: "<<seeds[0]<<", "<<seeds[1]<<std::endl;
 
 

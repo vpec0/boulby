@@ -8,11 +8,11 @@
 
 namespace AnaTree {
 
-const int MAX_NEUTRONS = 800;
+    const int MAX_NEUTRONS = 2048; // just hoping this will never be exceeded
 
-struct Event_t;
-TTree* createTree(const char* tree_name, Event_t& event);
-void resetEvent(Event_t&);
+    struct Event_t;
+    TTree* createTree(const char* tree_name, Event_t& event);
+    void resetEvent(Event_t&);
 
 #define VAR_LIST				\
     INT(runNo);					\
@@ -32,9 +32,9 @@ void resetEvent(Event_t&);
 #define INT_ARR(var, size) Int_t var[MAX_NEUTRONS]
 #define DOUBLE_ARR(var, size) Double_t var[MAX_NEUTRONS]
 #define DOUBLE_ARR2(var, size1, size2) Double_t var[MAX_NEUTRONS][size2]
-struct Event_t {
-    VAR_LIST;
-};
+    struct Event_t {
+	VAR_LIST;
+    };
 #undef INT
 #undef STRING_ARR
 #undef INT_ARR
@@ -51,13 +51,13 @@ struct Event_t {
 #define DOUBLE_ARR(var, size) tree->Branch(#var, event.var, #var"["#size"]/D")
 #define DOUBLE_ARR2(var, size1, size2) tree->Branch(#var, event.var, #var"["#size1"]["#size2"]/D")
 
-TTree* createTree(const char* tree_name, Event_t& event) {
-    TTree* tree = new TTree(tree_name, tree_name);
+    TTree* createTree(const char* tree_name, Event_t& event) {
+	TTree* tree = new TTree(tree_name, tree_name);
 
-    VAR_LIST;
+	VAR_LIST;
 
-    return tree;
-}
+	return tree;
+    }
 
 #undef INT
 #undef STRING_ARR
@@ -71,11 +71,11 @@ TTree* createTree(const char* tree_name, Event_t& event) {
 #define DOUBLE_ARR(var, size) tree->SetBranchAddress(#var, event.var)
 #define DOUBLE_ARR2(var, size1, size2) tree->SetBranchAddress(#var, event.var)
 
-TTree* registerTree(TTree* tree, Event_t& event) {
-    VAR_LIST;
+    TTree* registerTree(TTree* tree, Event_t& event) {
+	VAR_LIST;
 
-    return tree;
-}
+	return tree;
+    }
 
 #undef INT
 #undef STRING_ARR
@@ -83,9 +83,9 @@ TTree* registerTree(TTree* tree, Event_t& event) {
 #undef DOUBLE_ARR
 #undef DOUBLE_ARR2
 
-void resetEvent(Event_t& evt) {
-    evt = {};
-}
+    void resetEvent(Event_t& evt) {
+	evt = {};
+    }
 
 
 

@@ -39,6 +39,7 @@
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4Material.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -68,6 +69,14 @@ G4VPhysicalVolume* simple_geom_DetectorConstruction::Construct()
   //
   G4double env_sizeXY = 1.1*box_sizeXY, env_sizeZ = 1.1*box_sizeZ;
   G4Material* env_mat = nist->FindOrBuildMaterial("G4_WATER");
+
+  // Defining materials
+  //
+  // G4double density = 1.032*g/cm3;
+  // G4Material* Sci = new G4Material(name="Scintillator", density, ncomponents=2);
+  // Sci->AddElement(elC, natoms=9);
+  // Sci->AddElement(elH, natoms=10);
+
 
   // Option to switch on/off checking of volumes overlaps
   //
@@ -127,7 +136,7 @@ G4VPhysicalVolume* simple_geom_DetectorConstruction::Construct()
     new G4Box("Box",
 	      0.5*box_sizeXY, 0.5*box_sizeXY, 0.5*box_sizeZ);
 
-  G4Material* box_mat = nist->FindOrBuildMaterial("G4_TOLUENE");
+  G4Material* box_mat = nist->FindOrBuildMaterial("G4_PLASTIC_SC_VINYLTOLUENE");
   G4ThreeVector pos1 = G4ThreeVector();
 
   G4LogicalVolume* logicBox =
