@@ -43,9 +43,10 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-simple_geom_DetectorConstruction::simple_geom_DetectorConstruction()
+simple_geom_DetectorConstruction::simple_geom_DetectorConstruction(G4String material_name)
 : G4VUserDetectorConstruction(),
-  fScoringVolume(0)
+  fScoringVolume(0),
+  fMaterial(material_name)
 { }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -60,22 +61,55 @@ G4VPhysicalVolume* simple_geom_DetectorConstruction::Construct()
   // Get nist material manager
   G4NistManager* nist = G4NistManager::Instance();
 
-  // Geometrical parameters
+  // Geometrical parameters for active regions
+  //
   G4double box_sizeXY = 20*m;
   G4double box_sizeZ = 40*m;
+
+  G4double density = 1.0*g/cm3;
+  G4Material* box_mat = 0;
+
+  std::map<G4String, G4int> sw_map = {
+      {"polyethylene_standard", 1},
+      {"plastic_sc", 2},
+      {"ch2", 3},
+      {"water", 4},
+      {"lead", 5},
+      {"toluene", 6},
+      {"salt", 7},
+  };
+  switch(sw_map[fMaterial]) {
+  case 3 :
+      box_mat = new G4Material("CH2", density, 2);
+      box_mat->AddElement(nist->FindOrBuildElement("C"), 1);
+      box_mat->AddElement(nist->FindOrBuildElement("H"), 2);
+      break;
+  case 2 :
+      box_mat = nist->FindOrBuildMaterial("G4_PLASTIC_SC_VINYLTOLUENE");
+      break;
+  case 1 :
+      box_mat = nist->FindOrBuildMaterial("G4_POLYETHYLENE");
+      break;
+  case 4 :
+      box_mat = nist->FindOrBuildMaterial("G4_WATER");
+      break;
+  default:
+      box_mat = nist->FindOrBuildMaterial("G4_POLYETHYLENE");
+  }
+
+  box_mat = new G4Material("Custom", density, box_mat);
+
 
 
   // Envelope parameters
   //
   G4double env_sizeXY = 1.1*box_sizeXY, env_sizeZ = 1.1*box_sizeZ;
-  G4Material* env_mat = nist->FindOrBuildMaterial("G4_WATER");
+  G4Material* env_mat = nist->FindOrBuildMaterial("G4_Galactic");
 
-  // Defining materials
-  //
-  // G4double density = 1.032*g/cm3;
-  // G4Material* Sci = new G4Material(name="Scintillator", density, ncomponents=2);
-  // Sci->AddElement(elC, natoms=9);
-  // Sci->AddElement(elH, natoms=10);
+  // World parameters
+  G4double world_sizeXY = 1.2*env_sizeXY;
+  G4double world_sizeZ  = 1.2*env_sizeZ;
+  G4Material* world_mat = nist->FindOrBuildMaterial("G4_Galactic");
 
 
   // Option to switch on/off checking of volumes overlaps
@@ -85,9 +119,6 @@ G4VPhysicalVolume* simple_geom_DetectorConstruction::Construct()
   //
   // World
   //
-  G4double world_sizeXY = 1.2*env_sizeXY;
-  G4double world_sizeZ  = 1.2*env_sizeZ;
-  G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
 
   G4Box* solidWorld =
     new G4Box("World",                       //its name
@@ -136,8 +167,9 @@ G4VPhysicalVolume* simple_geom_DetectorConstruction::Construct()
     new G4Box("Box",
 	      0.5*box_sizeXY, 0.5*box_sizeXY, 0.5*box_sizeZ);
 
-  //G4Material* box_mat = nist->FindOrBuildMaterial("G4_PLASTIC_SC_VINYLTOLUENE");
-  G4Material* box_mat = nist->FindOrBuildMaterial("G4_POLYETHYLENE");
+
+  // Defining the active region box
+
   G4ThreeVector pos1 = G4ThreeVector();
 
   G4LogicalVolume* logicBox =

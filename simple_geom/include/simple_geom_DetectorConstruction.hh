@@ -41,18 +41,19 @@ class G4LogicalVolume;
 class simple_geom_DetectorConstruction : public G4VUserDetectorConstruction
 {
   public:
-    simple_geom_DetectorConstruction();
+    simple_geom_DetectorConstruction(G4String material_name);
     virtual ~simple_geom_DetectorConstruction();
 
     virtual G4VPhysicalVolume* Construct();
-    
+
     G4LogicalVolume* GetScoringVolume() const { return fScoringVolume; }
 
   protected:
     G4LogicalVolume*  fScoringVolume;
+
+    G4String fMaterial;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
-

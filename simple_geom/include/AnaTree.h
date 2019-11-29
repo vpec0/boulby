@@ -8,7 +8,7 @@
 
 namespace AnaTree {
 
-    const int MAX_NEUTRONS = 2048; // just hoping this will never be exceeded
+    const int MAX_NEUTRONS = 4096; // just hoping this will never be exceeded
 
     struct Event_t;
     TTree* createTree(const char* tree_name, Event_t& event);

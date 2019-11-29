@@ -50,6 +50,13 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 int main(int argc,char** argv)
+/**
+ * Input parameters:
+ *   1: string;  run macro file
+ *   2: string;  output file
+ *   3: integer; Start run
+ *   4: string;  active material
+ **/
 {
   std::cout<<">>> simple_geom: begin."<<std::endl;
   // Detect interactive mode (if no arguments) and define UI session
@@ -83,7 +90,10 @@ int main(int argc,char** argv)
   // Set mandatory initialization classes
   //
   // Detector construction
-  simple_geom_DetectorConstruction* detconst = new simple_geom_DetectorConstruction();
+  G4String material = "polyethylene_standard";
+  if (argc > 4)
+      material = argv[4];
+  simple_geom_DetectorConstruction* detconst = new simple_geom_DetectorConstruction(material);
   runManager->SetUserInitialization(detconst);
 
   // Physics list
