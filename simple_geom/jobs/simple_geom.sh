@@ -25,8 +25,8 @@ GEANT4_HOME=${LCG_REPO}/releases/${LCG_VERSION}/Geant4/${G4_VERSION}/${BUILD_VER
 EXECUTE ". $GEANT4_HOME/Geant4-env.sh"
 EXECUTE '. $GEANT4_HOME/bin/geant4.sh'
 
-HOMEDIR=${HOME}/work/boulby/dev/work
-OUTDIR=${HOME}/work/boulby/dev/data/$MATERIAL/$CHARGE/$ENERGY/$RUN_NO
+HOMEDIR=/home/vpec/work/boulby/dev/work
+OUTDIR=/home/vpec/work/boulby/dev/data/env_vac/$MATERIAL/$CHARGE/$ENERGY/$RUN_NO
 LOGDIR=$OUTDIR
 #/home/vpec/work/boulby/dev/jobs/logs
 LOGFILE=$LOGDIR/sim_$RUN_NO.log
@@ -42,9 +42,9 @@ cat $HOMEDIR/run.mac |sed "s/energy 280/energy $ENERGY/g" | sed "s/beamOn 10000/
     sed "s/particle mu+/particle $CHARGE_CODE/g" \
     > $MACRO_FILE
 
-echo $MACRO_FILE ":" > $LOGFILE
-cat  $MACRO_FILE >> $LOGFILE
+echo $MACRO_FILE ":" &> $LOGFILE
+cat  $MACRO_FILE &>> $LOGFILE
 
-date >> $LOGFILE
-$HOMEDIR/simple_geom_${MATERIAL} $MACRO_FILE $OUTDIR/sim.root $RUN_NO &>> $LOGFILE
-date >> $LOGFILE
+date &>> $LOGFILE
+$HOMEDIR/simple_geom $MACRO_FILE $OUTDIR/sim.root $RUN_NO ${MATERIAL} &>> $LOGFILE
+date &>> $LOGFILE

@@ -1,7 +1,7 @@
 Energy			= 280
 NEvents			= 10000
-RunNo			= ( 20200 + $(Process) )
-Material		= plastic_sc
+RunNo			= ( 20600 + $(Process) )
+Material		= polyethylene_standard
 executable		= simple_geom.sh
 arguments		= $(Charge) $(Energy) $(Material) $INT(RunNo) $(NEvents)
 LogDir			= logs/$(Material)/$(Charge)/$(Energy)
@@ -18,8 +18,30 @@ log			= $(LogDir)/simple_geom_$(Charge)_$(Energy)_GeV_$INT(RunNo).log
 #transfer_output_remaps	= "$(Output)=$(DataDir)/$(Output);$(Error)=$(DataDir)/$(Error);sim.root=$(DataDir)/sim.root"
 #transfer_output_remaps	= "sim.root=$(DataDir)/sim.root"
 
-queue 10 Charge Energy from ( muminus 240
-      muminus 320
-      muplus 240
-      muplus 320
-)
+
+
+NCharges 		= 2
+NEnergies 		= 4
+NPerItem		= 10
+N 	  		= $(NCharges) * $(NEnergies) * $(NPerItem)
+ChOption    		= $(Process) / ($(NEnergies) * $(NPerItem))
+EnOption		= ($(Process) / $(NPerItem)) % $(NEnergies) 
+
+Charge			= $CHOICE(ChOption, muminus, muplus)
+Energy			= $CHOICE(EnOption, 30, 100, 280, 1000) 
+
+queue $(N)
+
+# Energy	= 1000
+# queue 10  Charge in muminus muplus 
+
+
+# queue 10 Charge Energy from ( muminus 240
+#       Muminus 280
+#       muminus 320
+#       muplus 240
+#       muplus 280
+#       muplus 320
+# )
+
+# queue 5 Charge in muplus
