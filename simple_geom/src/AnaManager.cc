@@ -45,7 +45,8 @@ AnaManager::AnaManager(const char* filename):
         fFileName(filename),
 	fRootFile(0),
 	fTree(0),
-	fEabs(0.), fEgap(0.) ,fLabs(0.), fLgap(0.), mEvent()
+	fEabs(0.), fEgap(0.) ,fLabs(0.), fLgap(0.), mEvent(),
+	mWarningMessageCount(0)
 {
 
   // histograms
@@ -178,7 +179,7 @@ void AnaManager::PrintStatistic()
 void AnaManager::Reset()
 {
     mEvent = {};
-
+    mWarningMessageCount = 0;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

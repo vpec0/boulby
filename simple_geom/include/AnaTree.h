@@ -18,6 +18,7 @@ namespace AnaTree {
     INT(runNo);					\
     INT(eventNo);				\
     INT(n_neutrons);				\
+    INT(n_neutrons_total);    			\
     DOUBLE_ARR(n_energy,n_neutrons);		\
     DOUBLE_ARR2(start_xyz, n_neutrons, 3);	\
     DOUBLE_ARR2(end_xyz, n_neutrons, 3);	\
@@ -28,7 +29,7 @@ namespace AnaTree {
 
 
 #define INT(var) Int_t var
-#define STRING_ARR(var) std::vector<std::string> var
+#define STRING_ARR(var) std::vector<std::string>* var
 #define INT_ARR(var, size) Int_t var[MAX_NEUTRONS]
 #define DOUBLE_ARR(var, size) Double_t var[MAX_NEUTRONS]
 #define DOUBLE_ARR2(var, size1, size2) Double_t var[MAX_NEUTRONS][size2]

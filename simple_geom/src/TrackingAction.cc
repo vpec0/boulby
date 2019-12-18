@@ -54,12 +54,17 @@ void TrackingAction::PreUserTrackingAction(const G4Track* trk)
     if ( mAnaM->mEvent.n_neutrons >= AnaTree::MAX_NEUTRONS ) {
 	// we don't have enough capacity allocated to store more
 	// print out a warning message and don't record the neutron
-	std::cerr<<"WARNING: TrackingAction::PreUserTrackingAction(): "
-		 <<"reached a hardcoded limit of neutrons to be stored: "
-		 << AnaTree::MAX_NEUTRONS << std::endl
-		 <<"         Will not store any more neutrons in this event ("
-		 <<mAnaM->mEvent.runNo<<", "
-		 <<mAnaM->mEvent.eventNo<<")." << std::endl;
+	if (mAnaM->mWarningMessageCount < 1) {
+	    std::cerr<<"WARNING: TrackingAction::PreUserTrackingAction(): "
+		     <<"run "<<mAnaM->mEvent.runNo
+		     <<" event "<<mAnaM->mEvent.eventNo
+		     <<"reached a hardcoded limit of neutrons to be stored: "
+		     << AnaTree::MAX_NEUTRONS << std::endl
+		     <<"         Will not store any more neutrons in this event ("
+		     <<mAnaM->mEvent.runNo<<", "
+		     <<mAnaM->mEvent.eventNo<<")." << std::endl;
+	    mAnaM->mWarningMessageCount++;
+	}
 	return;
     }
 
@@ -85,9 +90,9 @@ void TrackingAction::PostUserTrackingAction(const G4Track* trk)
     if (trk->GetParticleDefinition()->GetPDGEncoding() != 2112) return;
     if ( mAnaM->mEvent.n_neutrons >= AnaTree::MAX_NEUTRONS ) {
 	// we don't have enough capacity allocated to store more
+	mAnaM->mEvent.n_neutrons_total++;
 	return;
     }
-
 
     int n = mAnaM->mEvent.n_neutrons;
 
@@ -95,6 +100,7 @@ void TrackingAction::PostUserTrackingAction(const G4Track* trk)
     mAnaM->mEvent.end_xyz[n][1] = trk->GetPosition().getY()/CLHEP::cm;
     mAnaM->mEvent.end_xyz[n][2] = trk->GetPosition().getZ()/CLHEP::cm;
 
+    mAnaM->mEvent.n_neutrons_total++;
     mAnaM->mEvent.n_neutrons++;
 
 }

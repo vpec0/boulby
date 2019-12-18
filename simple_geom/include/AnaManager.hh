@@ -82,6 +82,7 @@ class AnaManager
 
 public:
     AnaTree::Event_t mEvent;
+    int mWarningMessageCount;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
