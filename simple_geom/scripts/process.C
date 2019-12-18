@@ -5,18 +5,20 @@
 #define FOR(i, size) for (unsigned int i = 0; i < size; ++i)
 typedef const char* STR;
 
-void doXlog(TH1*);
+void doXlog(TH1*, int which = 0);
 
 void process(STR fname, STR outpref, STR charge = "default", STR material = "default", STR energy = "default")
 {
     // input tree
     auto tree = new TChain("events");
+    tree->SetMakeClass(1);
     int status = tree->Add(fname);
     if (!status) {
 	cerr<< "Can't get events tree from file "<<fname<<endl;
 	return;
     }
     auto evt = new AnaTree::Event_t;
+    AnaTree::resetEvent(*evt);
     AnaTree::registerTree(tree, *evt);
 
 
@@ -27,7 +29,8 @@ void process(STR fname, STR outpref, STR charge = "default", STR material = "def
 	"start_xyz",
 	"end_xyz",
 	"trackId",
-	"parentId"
+	"parentId",
+	"process"
     };
     tree->SetBranchStatus("*", 0);
     for (auto allow: allowed)
@@ -43,9 +46,11 @@ void process(STR fname, STR outpref, STR charge = "default", STR material = "def
 	kN,
 	kNlog,
 	kZ,
-	kXY
+	kXY,
+	kProcess,
+	kEnProcess,
     };
-    const unsigned N_HISTS = 6;
+    const unsigned N_HISTS = 8;
 
     TH1* hists[2][N_HISTS]; // 1st dim: before and after spatial cut; 2nd dim: particular histograms
     STR cuts[2] = {"before", "after"};
@@ -66,6 +71,13 @@ void process(STR fname, STR outpref, STR charge = "default", STR material = "def
 	hists[i][kZ] = hZ;
 	auto hXY = new TH2F(Form("%s_xy_%s", charge, cuts[i]),"", 200, -10e2, 10e2, 200, -10e2, 10e2);
 	hists[i][kXY] = hXY;
+
+	auto hProc = new TH1F(Form("%s_process_%s", charge, cuts[i]),"", 10,0,-1);
+	hists[i][kProcess] = hProc;
+
+	auto hEnProc = new TH2F(Form("%s_energy_process_%s", charge, cuts[i]),"", 10,0,-1, 700, 0.1, 1e6);
+	hists[i][kEnProcess] = hEnProc;
+	doXlog(hEnProc, 1);
     }
 
     //**************************************************************************
@@ -86,8 +98,16 @@ void process(STR fname, STR outpref, STR charge = "default", STR material = "def
     size = 20; // just for debugging
 #endif
 
+    int step = size / 50;
+
     cout << "Will process "<<size<<" entries."<<endl;
+    cout<<"|                                                  |\r|";
+    cout.flush();
     FOR(ientry, size) {
+	if (step && (ientry+1) % step == 0 ) {
+            cout<<"-";
+            cout.flush();
+        }
 	tree->GetEntry(ientry);
 
 	// select hists to be filled before spatial cuts
@@ -171,17 +191,25 @@ void process(STR fname, STR outpref, STR charge = "default", STR material = "def
 		cout<<"*,";
 #endif
 
+	    // cout<<"Entry "<<ientry<<", neutron "<<i<<endl
+	    // 	<<(evt->process->at(i).c_str())<<endl;
+
+
 	    // store this neutrons info immediately
 	    hE->Fill(energy);
 	    hists[0][kElog]->Fill(energy);
 	    hists[0][kZ]->Fill(evt->start_xyz[i][2]);
 	    hists[0][kXY]->Fill(evt->start_xyz[i][0], evt->start_xyz[i][1]);
+	    hists[0][kProcess]->Fill(evt->process->at(i).c_str(), 1.);
+	    ((TH2*)hists[0][kEnProcess])->Fill(evt->process->at(i).c_str(), energy, 1.);
 	    neutron_count++;
 	    if (passed) {
 		hEcut->Fill(energy);
 		hists[1][kElog]->Fill(energy);
 		hists[1][kZ]->Fill(evt->start_xyz[i][2]);
 		hists[1][kXY]->Fill(evt->start_xyz[i][0], evt->start_xyz[i][1]);
+		hists[1][kProcess]->Fill(evt->process->at(i).c_str(), 1.);
+		((TH2*)hists[1][kEnProcess])->Fill(evt->process->at(i).c_str(), energy, 1.);
 		neutron_count_cut++;
 	    }
 	}
@@ -223,6 +251,8 @@ void process(STR fname, STR outpref, STR charge = "default", STR material = "def
 		hists[0][kElog]->Fill(evt->n_energy[i]);
 		hists[0][kZ]->Fill(evt->start_xyz[i][2]);
 		hists[0][kXY]->Fill(evt->start_xyz[i][0], evt->start_xyz[i][1]);
+		hists[0][kProcess]->Fill(evt->process->at(i).c_str(), 1.);
+		((TH2*)hists[0][kEnProcess])->Fill(evt->process->at(i).c_str(), evt->n_energy[i], 1.);
 	    }
 #ifdef DEBUG
 	    if (evt->n_neutrons < MAX_NEUTRONS_DEBUG )
@@ -244,6 +274,8 @@ void process(STR fname, STR outpref, STR charge = "default", STR material = "def
 		hists[1][kElog]->Fill(evt->n_energy[i]);
 		hists[1][kZ]->Fill(evt->start_xyz[i][2]);
 		hists[1][kXY]->Fill(evt->start_xyz[i][0], evt->start_xyz[i][1]);
+		hists[1][kProcess]->Fill(evt->process->at(i).c_str(), 1.);
+		((TH2*)hists[1][kEnProcess])->Fill(evt->process->at(i).c_str(), evt->n_energy[i], 1.);
 	    }
 	}
 
@@ -257,6 +289,7 @@ void process(STR fname, STR outpref, STR charge = "default", STR material = "def
 	hists[0][kNlog] -> Fill(neutron_count);
 	hists[1][kNlog] -> Fill(neutron_count_cut);
     }
+    cout<<"|"<<endl;
 
     // hists["energy"] -> Draw();
     // new TCanvas();
@@ -275,13 +308,15 @@ void process(STR fname, STR outpref, STR charge = "default", STR material = "def
 }
 
 
-void doXlog(TH1* h)
+void doXlog(TH1* h, int which)
 // redo scales for x-log hists
 {
-    double start = TMath::Log10(h->GetXaxis()->GetXmin());
-    double stop = TMath::Log10(h->GetXaxis()->GetXmax());
+    TAxis* axis = (which==0)?h->GetXaxis():h->GetYaxis();
+
+    double start = TMath::Log10(axis->GetXmin());
+    double stop = TMath::Log10(axis->GetXmax());
     double range = stop - start;
-    int nbins = h->GetXaxis()->GetNbins();
+    int nbins = axis->GetNbins();
     double binwidth = range / nbins;
 
     double *bins = new double[nbins+1];
@@ -289,7 +324,7 @@ void doXlog(TH1* h)
 	bins[i] = TMath::Power(10, start + i*binwidth);
     }
 
-    h->GetXaxis()->Set(nbins, bins);
+    axis->Set(nbins, bins);
 
     delete[] bins;
 }
