@@ -77,23 +77,62 @@ G4VPhysicalVolume* simple_geom_DetectorConstruction::Construct()
       {"lead", 5},
       {"toluene", 6},
       {"salt", 7},
+      {"iron", 8},
+      {"copper", 9},
+      {"mangan", 10},
+      {"magnesium", 11}
   };
+
   switch(sw_map[fMaterial]) {
   case 3 :
       box_mat = new G4Material("CH2", density, 2);
       box_mat->AddElement(nist->FindOrBuildElement("C"), 1);
       box_mat->AddElement(nist->FindOrBuildElement("H"), 2);
       break;
+
   case 2 :
       box_mat = nist->FindOrBuildMaterial("G4_PLASTIC_SC_VINYLTOLUENE");
       break;
+
   case 1 :
       box_mat = nist->FindOrBuildMaterial("G4_POLYETHYLENE");
       break;
+
   case 4 :
       box_mat = nist->FindOrBuildMaterial("G4_WATER");
       break;
+
+  case 5:
+      box_mat = nist->FindOrBuildMaterial("G4_Pb");
+      // box_mat = new G4Material("Lead", density, 2);
+      // box_mat->AddElement(nist->FindOrBuildElement("G4_Pb"), 1);
+      break;
+
+  case 7 :
+      box_mat = new G4Material("Salt", density, 2);
+      box_mat->AddElement(nist->FindOrBuildElement("Na"), 1);
+      box_mat->AddElement(nist->FindOrBuildElement("Cl"), 1);
+      break;
+
+  case 8:
+      box_mat = nist->FindOrBuildMaterial("G4_Fe");
+      break;
+
+  case 9:
+      box_mat = nist->FindOrBuildMaterial("G4_Cu");
+      break;
+
+  case 10:
+      box_mat = nist->FindOrBuildMaterial("G4_Mn");
+      break;
+
+  case 11:
+      box_mat = nist->FindOrBuildMaterial("G4_Mg");
+      break;
+
   default:
+      std::cout<<"WARNING: simple_geom_DetectorConstruction::Construct(): Material "
+	       <<fMaterial<<" not defined, will use polyethylene."<<std::endl;
       box_mat = nist->FindOrBuildMaterial("G4_POLYETHYLENE");
   }
 
