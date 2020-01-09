@@ -85,7 +85,10 @@ namespace AnaTree {
 #undef DOUBLE_ARR2
 
     void resetEvent(Event_t& evt) {
+	if (evt.process)
+	    delete evt.process;
 	evt = {};
+	evt.process = new std::vector<std::string>;
     }
 
 

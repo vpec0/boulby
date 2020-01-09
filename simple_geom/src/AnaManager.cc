@@ -58,7 +58,7 @@ AnaManager::AnaManager():
     fFileName("simple_geom_anatree.root"),
     fRootFile(0),
     fTree(0),
-    fEabs(0.), fEgap(0.) ,fLabs(0.), fLgap(0.), mEvent()
+    fEabs(0.), fEgap(0.) ,fLabs(0.), fLgap(0.), mEvent({})
 {
 
   // histograms
@@ -178,7 +178,7 @@ void AnaManager::PrintStatistic()
 
 void AnaManager::Reset()
 {
-    mEvent = {};
+    AnaTree::resetEvent(mEvent);
     mWarningMessageCount = 0;
 }
 
