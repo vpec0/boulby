@@ -28,7 +28,7 @@
 /// \brief Main program of the simple_geom_ example
 
 #include "simple_geom_DetectorConstruction.hh"
-#include "simple_geom_ActionInitialization.hh"
+//#include "simple_geom_ActionInitialization.hh"
 
 #undef G4MULTITHREADED
 #ifdef G4MULTITHREADED
@@ -44,6 +44,12 @@
 #include "G4UIExecutive.hh"
 
 #include "Randomize.hh"
+
+#include "simple_geom_PrimaryGeneratorAction.hh"
+#include "simple_geom_RunAction.hh"
+#include "simple_geom_EventAction.hh"
+#include "simple_geom_SteppingAction.hh"
+#include "TrackingAction.hh"
 
 #include "AnaManager.hh"
 
@@ -112,7 +118,17 @@ int main(int argc,char** argv)
   anam->Book();
 
   // User action initialization
-  runManager->SetUserInitialization(new simple_geom_ActionInitialization(detconst, anam));
+  // runManager->SetUserInitialization(new simple_geom_ActionInitialization(detconst, anam));
+
+  auto runac = new simple_geom_RunAction(anam);
+  runManager->SetUserAction(runac);
+  runManager->SetUserAction(new simple_geom_PrimaryGeneratorAction());
+  auto evtac = new simple_geom_EventAction(runac, anam);
+  runManager->SetUserAction(evtac);
+  runManager->SetUserAction(new TrackingAction(detconst, anam));
+  runManager->SetUserAction(new simple_geom_SteppingAction(evtac));
+
+
 
   // Initialize visualization
   //
