@@ -41,6 +41,8 @@
 #include "G4SystemOfUnits.hh"
 #include "G4Material.hh"
 
+#include "Geometry.hh"
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 DetectorConstruction::DetectorConstruction(G4String material_name)
