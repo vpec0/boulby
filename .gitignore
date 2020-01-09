@@ -35,3 +35,6 @@
 # backup files
 *.bak
 *~
+
+# emacs related
+.emacs*
