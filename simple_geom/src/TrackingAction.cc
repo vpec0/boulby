@@ -76,7 +76,7 @@ void TrackingAction::PreUserTrackingAction(const G4Track* trk)
     mAnaM->mEvent.start_xyz[n][1] = trk->GetVertexPosition().getY()/CLHEP::cm;
     mAnaM->mEvent.start_xyz[n][2] = trk->GetVertexPosition().getZ()/CLHEP::cm;
 
-    mAnaM->mEvent.process.push_back(trk->GetCreatorProcess()->GetProcessName());
+    mAnaM->mEvent.process->push_back(trk->GetCreatorProcess()->GetProcessName());
     mAnaM->mEvent.trackId[n] = trk->GetTrackID();
     mAnaM->mEvent.parentId[n] = trk->GetParentID();
 
