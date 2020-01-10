@@ -18,7 +18,8 @@ void process(STR fname, STR outpref, STR charge = "default", STR material = "def
 	return;
     }
     auto evt = new AnaTree::Event_t;
-    AnaTree::resetEvent(*evt);
+    *evt = {};
+    //AnaTree::resetEvent(*evt);
     AnaTree::registerTree(tree, *evt);
 
 
@@ -108,7 +109,9 @@ void process(STR fname, STR outpref, STR charge = "default", STR material = "def
             cout<<"-";
             cout.flush();
         }
+	//cout<<evt->process<<endl;
 	tree->GetEntry(ientry);
+	//cout<<evt->process<<endl;
 
 	// select hists to be filled before spatial cuts
 	auto hE = hists[0][kE];
@@ -200,16 +203,20 @@ void process(STR fname, STR outpref, STR charge = "default", STR material = "def
 	    hists[0][kElog]->Fill(energy);
 	    hists[0][kZ]->Fill(evt->start_xyz[i][2]);
 	    hists[0][kXY]->Fill(evt->start_xyz[i][0], evt->start_xyz[i][1]);
-	    hists[0][kProcess]->Fill(evt->process->at(i).c_str(), 1.);
-	    ((TH2*)hists[0][kEnProcess])->Fill(evt->process->at(i).c_str(), energy, 1.);
+	    if (evt->process) {
+		hists[0][kProcess]->Fill(evt->process->at(i).c_str(), 1.);
+		((TH2*)hists[0][kEnProcess])->Fill(evt->process->at(i).c_str(), energy, 1.);
+	    }
 	    neutron_count++;
 	    if (passed) {
 		hEcut->Fill(energy);
 		hists[1][kElog]->Fill(energy);
 		hists[1][kZ]->Fill(evt->start_xyz[i][2]);
 		hists[1][kXY]->Fill(evt->start_xyz[i][0], evt->start_xyz[i][1]);
-		hists[1][kProcess]->Fill(evt->process->at(i).c_str(), 1.);
-		((TH2*)hists[1][kEnProcess])->Fill(evt->process->at(i).c_str(), energy, 1.);
+		if (evt->process) {
+		    hists[1][kProcess]->Fill(evt->process->at(i).c_str(), 1.);
+		    ((TH2*)hists[1][kEnProcess])->Fill(evt->process->at(i).c_str(), energy, 1.);
+		}
 		neutron_count_cut++;
 	    }
 	}
@@ -251,8 +258,10 @@ void process(STR fname, STR outpref, STR charge = "default", STR material = "def
 		hists[0][kElog]->Fill(evt->n_energy[i]);
 		hists[0][kZ]->Fill(evt->start_xyz[i][2]);
 		hists[0][kXY]->Fill(evt->start_xyz[i][0], evt->start_xyz[i][1]);
-		hists[0][kProcess]->Fill(evt->process->at(i).c_str(), 1.);
-		((TH2*)hists[0][kEnProcess])->Fill(evt->process->at(i).c_str(), evt->n_energy[i], 1.);
+		if (evt->process) {
+		    hists[0][kProcess]->Fill(evt->process->at(i).c_str(), 1.);
+		    ((TH2*)hists[0][kEnProcess])->Fill(evt->process->at(i).c_str(), evt->n_energy[i], 1.);
+		}
 	    }
 #ifdef DEBUG
 	    if (evt->n_neutrons < MAX_NEUTRONS_DEBUG )
@@ -274,8 +283,10 @@ void process(STR fname, STR outpref, STR charge = "default", STR material = "def
 		hists[1][kElog]->Fill(evt->n_energy[i]);
 		hists[1][kZ]->Fill(evt->start_xyz[i][2]);
 		hists[1][kXY]->Fill(evt->start_xyz[i][0], evt->start_xyz[i][1]);
-		hists[1][kProcess]->Fill(evt->process->at(i).c_str(), 1.);
-		((TH2*)hists[1][kEnProcess])->Fill(evt->process->at(i).c_str(), evt->n_energy[i], 1.);
+		if (evt->process) {
+		    hists[1][kProcess]->Fill(evt->process->at(i).c_str(), 1.);
+		    ((TH2*)hists[1][kEnProcess])->Fill(evt->process->at(i).c_str(), evt->n_energy[i], 1.);
+		}
 	    }
 	}
 
