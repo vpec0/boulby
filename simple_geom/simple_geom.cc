@@ -37,9 +37,10 @@
 #include "G4RunManager.hh"
 #endif
 
-#include "G4UImanager.hh"
 #include "Shielding.hh"
+#include "G4EmExtraPhysics.hh"
 
+#include "G4UImanager.hh"
 #include "G4VisExecutive.hh"
 #include "G4UIExecutive.hh"
 
@@ -104,8 +105,17 @@ int main(int argc,char** argv)
 
   // Physics list
   G4VModularPhysicsList* physicsList = new Shielding;
+
+  // make sure muon-nuclear processes are ON
+  G4EmExtraPhysics* emex = new G4EmExtraPhysics(1);
+  G4String status = "ON";
+  emex->MuonNuclear(status);
+  physicsList->ReplacePhysics(emex);
+
   physicsList->SetVerboseLevel(1);
   runManager->SetUserInitialization(physicsList);
+
+
 
   TString outfname("");
   AnaManager* anam = 0;
