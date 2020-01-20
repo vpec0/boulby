@@ -63,7 +63,7 @@ int main(int argc,char** argv)
   //
   G4UIExecutive* ui = 0;
   if ( argc == 1 ) {
-    ui = new G4UIExecutive(argc, argv);
+      ui = new G4UIExecutive(argc, argv, "tcsh");
   }
 
   std::cout<<">>> simple_geom: deal with random number settings..."<<std::endl;
@@ -80,8 +80,10 @@ int main(int argc,char** argv)
   //
 #ifdef G4MULTITHREADED
   G4MTRunManager* runManager = new G4MTRunManager;
+  std::cout<<"Running in multi-thread mode."<<std::endl;
 #else
   G4RunManager* runManager = new G4RunManager;
+  std::cout<<"Running in single-thread mode."<<std::endl;
 #endif
 
 
@@ -101,18 +103,18 @@ int main(int argc,char** argv)
   physicsList->SetVerboseLevel(1);
   runManager->SetUserInitialization(physicsList);
 
-  TString outfname("");
-  AnaManager* anam = 0;
-  if (argc>2) {
-      outfname = argv[2];
-      anam = new AnaManager(outfname);
-  } else
-      anam = new AnaManager();
+  // TString outfname("");
+  // AnaManager* anam = 0;
+  // if (argc>2) {
+  //     outfname = argv[2];
+  //     anam = new AnaManager(outfname);
+  // } else
+  //     anam = new AnaManager();
 
-  anam->Book();
+  // anam->Book();
 
   // User action initialization
-  runManager->SetUserInitialization(new ActionInitialization(detconst, anam));
+  //runManager->SetUserInitialization(new ActionInitialization(detconst, anam));
 
   // Initialize visualization
   //
@@ -146,9 +148,9 @@ int main(int argc,char** argv)
   // owned and deleted by the run manager, so they should not be deleted
   // in the main() program !
 
-  anam->Save();
+  //anam->Save();
 
-  delete anam;
+  //delete anam;
   //delete visManager;
   delete runManager;
   std::cout<<">>> simple_geom: end."<<std::endl;
