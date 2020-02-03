@@ -50,13 +50,13 @@
 #include "G4SystemOfUnits.hh"
 
 namespace Geometry {
-
+    using namespace std;
 
     /// Cryostat
     /// Defined properties
 
     // Active region
-    const char*  TPC_MATERIAL = "LXe";
+    const G4String  TPC_MATERIAL = "LXe";
     const double TPC_H = 2.5 * m; // height
     const double TPC_D = 3.5 * m; // diameter
     // position - active volume centered
@@ -66,48 +66,65 @@ namespace Geometry {
 
 
     // reflective cover
-    const char*  PTFE_MATERIAL  = "PTFE";
+    const G4String  PTFE_MATERIAL  = "PTFE";
     const double PTFE_THICKNESS = 3*cm;
 
     // reverse field region
-    const char* RFR_MATERIAL = "LXe";
+    const G4String RFR_MATERIAL = "LXe";
     const double RFR_H       = 20*cm;
 
     // approximation of PMT array
-    const char* PMT_ARR_MATERIAL = "Steel5";
+    const G4String PMT_ARR_MATERIAL = "Steel5";
     const double PMT_ARR_H = 40*cm;
 
     // TPC envelope volume to hold volumes described above; should
     // fill ~0.5 mm space between volumes so that they do not touch
-    const char* TPC_ENV_MATERIAL = "Vacuum";
+    const G4String TPC_ENV_MATERIAL = "Vacuum";
 
     // outer Xe skin
-    const char* SKIN_MATERIAL = "LXe";
+    const G4String SKIN_MATERIAL = "LXe";
     const double SKIN_THICK_SIDE = 8*cm;
     const double SKIN_THICK_BOTTOM = 70*cm;
 
     // top dome
-    const char* DOME_MATERIAL = "GXe";
+    const G4String DOME_MATERIAL = "GXe";
     const double DOME_H = 50*cm;
 
     // Inner detector envelope - to hold skin and dome volumes; should
     // fill ~0.5 mm space between volumes so that they do not touch
-    const char* ID_ENV_MATERIAL = "Vacuum";
+    const G4String ID_ENV_MATERIAL = "Vacuum";
 
     // inner cryostat vessel
-    const char* ICV_MATERIAL = "Titan";
+    const G4String ICV_MATERIAL = "Titanium";
     const double ICV_THICKNESS = 2*cm;
 
     // cryo vacuum
-    const char* VAC_MATERIAL = "Vacuum";
+    const G4String VAC_MATERIAL = "Vacuum";
     const double VAC_THICKNESS = 5*cm;
 
     // outer cryostat vessel
-    const char*  OCV_MATERIAL = "Titan";
+    const G4String  OCV_MATERIAL = "Titanium";
     const double OCV_THICKNESS = 2*cm;
 
 
-    /// Derived properties
+    // Hall
+    const G4String  HALL_MATERIAL = "Air";
+    const double HALL_SPACE_TOP = 2*m;
+    const double HALL_SPACE_BOTTOM = 1*m;
+    const double HALL_SPACE_SIDE = 2*m;
+
+
+    // World - Rock
+    const G4String  WORLD_MATERIAL = "Rock";
+    const double WORLD_SPACE = 3*m;
+
+
+    // helper variable
+    // envelope spacing
+    const double ENV_SPACING = 1*mm;
+
+
+    /// ========== Derived properties ==========
     /// - necessary to build the whole hierarchy of G4 volumes
 
     // bottom PTFE plate
@@ -143,20 +160,49 @@ namespace Geometry {
     const double SKIN_D = TPC_ENV_D + SKIN_THICK_SIDE;
 
     // top dome (cylinder)
-    // TODO
-    //const double DOME_H
+    const double DOME_D = SKIN_D;
 
+    // Inner detector
+    const double ID_ENV_D = SKIN_D;
+    const double ID_ENV_H = SKIN_H + DOME_H;
+
+    // ICV
+    const double ICV_D = ID_ENV_D + ICV_THICKNESS;
+    const double ICV_H = ID_ENV_H + ICV_THICKNESS;
+
+    // Cryo vacuum
+    const double VAC_D = ICV_D + VAC_THICKNESS;
+    const double VAC_H = ICV_H + VAC_THICKNESS;
+
+    /// OCV
+    const double OCV_D = VAC_D + OCV_THICKNESS;
+    const double OCV_H = VAC_H + OCV_THICKNESS;
 
     /// Pit
 
 
 
     /// Hall
+    const double HALL_W = OCV_D + 2*HALL_SPACE_SIDE;
+    const double HALL_H = OCV_H + HALL_SPACE_TOP + HALL_SPACE_BOTTOM;
+
+    // World
+    const double WORLD_W = HALL_W + 2*WORLD_SPACE;
+    const double WORLD_H = HALL_H + 2*WORLD_SPACE;
 
 
+    // Definition of materials
 
-
-
+    const std::map<const G4String,const G4String> material_map = {
+	{"LXe", "G4_lXe"},
+	{"PTFE", "PTFE"},
+	{"Steel5", "Steel5"},
+	{"Vacuum", "G4_Galactic"},
+	{"GXe", "G4_Xe"},
+	{"Titanium", "G4_Ti"},
+	{"Air", "G4_AIR"},
+	{"Rock", "StdRock"},
+    };
 
 
 } // end of namespace Geometry

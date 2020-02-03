@@ -31,6 +31,7 @@
 #define DetectorConstruction_h 1
 
 #include "G4VUserDetectorConstruction.hh"
+#include "G4NistManager.hh"
 #include "globals.hh"
 
 class G4VPhysicalVolume;
@@ -47,6 +48,9 @@ class DetectorConstruction : public G4VUserDetectorConstruction
     virtual G4VPhysicalVolume* Construct();
 
     G4LogicalVolume* GetScoringVolume() const { return fScoringVolume; }
+
+private:
+    void PrepareMaterials(G4NistManager* nist);
 
   protected:
     G4LogicalVolume*  fScoringVolume;
