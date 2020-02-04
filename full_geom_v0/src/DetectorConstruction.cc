@@ -299,7 +299,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 void DetectorConstruction::PrepareMaterials(G4NistManager* nist)
 {
     // create PTFE
-    const std::vector<G4String> elements = {"G4_F", "G4_C"};
+    const std::vector<G4String> elements = {"F", "C"};
     const std::vector<G4int> nAtoms = {4, 2};
     const G4double density = 2.2*g/cm3;
     nist->ConstructNewMaterial("PTFE", elements, nAtoms, density);
@@ -315,9 +315,9 @@ void DetectorConstruction::PrepareMaterials(G4NistManager* nist)
     //in turn should not be too different from standard rock. The density of 2.65g/cm^3
     //is the original "standard rock" density given by the full PDG report.
     auto StdRock = new G4Material("StdRock",2.65*g/cm3,4, kStateSolid );
-    StdRock->AddElement(nist->FindOrBuildElement("G4_O"),  52.*perCent);
-    StdRock->AddElement(nist->FindOrBuildElement("G4_Ca"), 27.*perCent);
-    StdRock->AddElement(nist->FindOrBuildElement("G4_C"),  12.*perCent);
-    StdRock->AddElement(nist->FindOrBuildElement("G4_Mg"),  9.*perCent);
+    StdRock->AddElement(nist->FindOrBuildElement("O"),  52.*perCent);
+    StdRock->AddElement(nist->FindOrBuildElement("Ca"), 27.*perCent);
+    StdRock->AddElement(nist->FindOrBuildElement("C"),  12.*perCent);
+    StdRock->AddElement(nist->FindOrBuildElement("Mg"),  9.*perCent);
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

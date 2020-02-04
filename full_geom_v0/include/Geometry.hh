@@ -130,10 +130,18 @@ namespace Geometry {
     // bottom PTFE plate
     const double PTFE_B_H = PTFE_THICKNESS;
     const double PTFE_B_D = TPC_D + 2*PTFE_THICKNESS;
+    // positioning in absolute coordinates (TPC placed at 0.)
+    const double PTFE_B_X = TPC_X;
+    const double PTFE_B_Y = TPC_Y;
+    const double PTFE_B_Z = TPC_Z - 0.5*TPC_H + 0.5*PTFE_THICKNESS;
+
 
     // top PTFE plate
     const double PTFE_T_H = PTFE_THICKNESS;
     const double PTFE_T_D = TPC_D + 2*PTFE_THICKNESS;
+    const double PTFE_T_X = TPC_X;
+    const double PTFE_T_Y = TPC_Y;
+    const double PTFE_T_Z = TPC_Z + 0.5*TPC_H + 0.5*PTFE_THICKNESS;
 
     // side PTFE tube
     const double PTFE_S_D_INNER = TPC_D; // Do this during the
