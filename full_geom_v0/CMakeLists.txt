@@ -1,4 +1,3 @@
-
 #----------------------------------------------------------------------------
 # Setup the project
 cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
@@ -42,6 +41,10 @@ include(${ROOT_USE_FILE})
 
 include_directories(${ROOT_INCLUDE_DIRS})
 
+# Set compilation flags
+# to suppress warning message:
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable -Wno-unused-parameter -Wno-unused-private-field -Wno-shadow")
+
 
 #----------------------------------------------------------------------------
 # Locate sources and headers for this project
@@ -66,7 +69,6 @@ set(FULL_GEOM_V0_SCRIPTS
   init_vis.mac
   run1.mac
   run2.mac
-  vis.mac
   runTest.mac
   )
 
@@ -77,6 +79,16 @@ foreach(_script ${FULL_GEOM_V0_SCRIPTS})
     COPYONLY
     )
 endforeach()
+
+file(GLOB vis_macros RELATIVE ${PROJECT_SOURCE_DIR}/ ${PROJECT_SOURCE_DIR}/vis*.mac)
+foreach(_macro ${vis_macros})
+  configure_file(
+    ${PROJECT_SOURCE_DIR}/${_macro}
+    ${PROJECT_BINARY_DIR}/${_macro}
+    COPYONLY
+    )
+endforeach()
+
 
 #----------------------------------------------------------------------------
 # For internal Geant4 use - but has no effect if you build this
