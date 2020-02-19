@@ -43,10 +43,9 @@
 using namespace Geometry;
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-DetectorConstruction::DetectorConstruction(G4String material_name)
+DetectorConstruction::DetectorConstruction()
 : G4VUserDetectorConstruction(),
-  fScoringVolume(0),
-  fMaterial(material_name)
+  fScoringVolume(0)
 { }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

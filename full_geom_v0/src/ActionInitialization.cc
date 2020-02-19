@@ -39,10 +39,12 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 ActionInitialization::ActionInitialization(DetectorConstruction* detconst,
-								   AnaManager* anam)
+					   G4String muon_file_name,
+					   AnaManager* anam)
     : G4VUserActionInitialization(),
       mAnaM(anam),
-      mDetConst(detconst)
+      mDetConst(detconst),
+      mMuonFileName(muon_file_name)
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -62,7 +64,7 @@ void ActionInitialization::BuildForMaster() const
 
 void ActionInitialization::Build() const
 {
-  SetUserAction(new PrimaryGeneratorAction);
+    SetUserAction(new PrimaryGeneratorAction(mMuonFileName, -1, 0));
 
   RunAction* runAction = new RunAction (mAnaM);
   SetUserAction(runAction);

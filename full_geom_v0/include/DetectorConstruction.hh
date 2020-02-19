@@ -42,7 +42,7 @@ class G4LogicalVolume;
 class DetectorConstruction : public G4VUserDetectorConstruction
 {
   public:
-    DetectorConstruction(G4String material_name);
+    DetectorConstruction();
     virtual ~DetectorConstruction();
 
     virtual G4VPhysicalVolume* Construct();
@@ -55,7 +55,6 @@ private:
   protected:
     G4LogicalVolume*  fScoringVolume;
 
-    G4String fMaterial;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

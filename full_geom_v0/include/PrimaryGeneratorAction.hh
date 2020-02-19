@@ -40,24 +40,55 @@ class G4Box;
 
 /// The primary generator action class with particle gun.
 ///
-/// The default kinematic is a 6 MeV gamma, randomly distribued 
+/// The default kinematic is a 6 MeV gamma, randomly distribued
 /// in front of the phantom across 80% of the (X,Y) phantom size.
 
 class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
-  public:
-    PrimaryGeneratorAction();    
+public:
+    PrimaryGeneratorAction();
+    PrimaryGeneratorAction(const char* fname, G4int nevents, G4int startevent);
+
     virtual ~PrimaryGeneratorAction();
 
     // method from the base class
-    virtual void GeneratePrimaries(G4Event*);         
-  
+    virtual void GeneratePrimaries(G4Event*);
+
     // method to access particle gun
     const G4ParticleGun* GetParticleGun() const { return fParticleGun; }
-  
-  private:
+
+    // setters and getters
+    void  SetNevents(G4int n) { fNevents = n; }
+    G4int GetNevents() { return fNevents; }
+
+    void  SetStartEvent(G4int n) { fStartEvent = n; }
+    G4int GetStartEvent() { return fStartEvent; }
+
+    void     SetMuonFileName(G4String s) { fMuonFileName = s; }
+    G4String GetMuonFileName() { return fMuonFileName; }
+
+private:
+    struct Muon_t {
+	int entry, pdg;
+	double energy,
+	    posX, posY, posZ,
+	    cosX, cosY, cosZ;
+    };
+
+private:
+    void ReadInMuonFile();
+
+private:
+    G4int fNevents;
+    G4int fStartEvent;
+    G4String fMuonFileName;
+    std::ifstream* fMuonFile;
+
     G4ParticleGun*  fParticleGun; // pointer a to G4 gun class
     G4Box* fEnvelopeBox;
+    std::vector<Muon_t> fMuons;
+
+    G4ParticleTable* fParticleTable;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

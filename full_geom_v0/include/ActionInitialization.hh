@@ -32,6 +32,8 @@
 
 #include "G4VUserActionInitialization.hh"
 
+#include "G4String.hh"
+
 class DetectorConstruction;
 
 class AnaManager;
@@ -41,7 +43,7 @@ class AnaManager;
 class ActionInitialization : public G4VUserActionInitialization
 {
   public:
-    ActionInitialization(DetectorConstruction*, AnaManager*);
+    ActionInitialization(DetectorConstruction*, G4String, AnaManager*);
     virtual ~ActionInitialization();
 
     virtual void BuildForMaster() const;
@@ -50,6 +52,7 @@ class ActionInitialization : public G4VUserActionInitialization
 private:
     AnaManager* mAnaM;
     DetectorConstruction* mDetConst;
+    G4String mMuonFileName;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

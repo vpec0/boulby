@@ -51,11 +51,11 @@
 
 int main(int argc,char** argv)
 /**
- * Input parameters:
+ * Input parameters (if macro given, then generator file needs to be supplied):
  *   1: string;  run macro file
- *   2: string;  output file
- *   3: integer; Start run
- *   4: string;  active material
+ *   2: string;  generator file
+ *   3: string;  output file
+ *   4: integer; Start run
  **/
 {
   std::cout<<">>> simple_geom: begin."<<std::endl;
@@ -66,14 +66,24 @@ int main(int argc,char** argv)
       ui = new G4UIExecutive(argc, argv, "tcsh");
   }
 
-  std::cout<<">>> simple_geom: deal with random number settings..."<<std::endl;
+  if (argc == 2) { //
+      std::cerr<<"error, when macro file supplied, path to muon file needs to be provided too"<<std::endl;
+      return -1;
+  }
+
+  G4String muon_file_name = "";
+  if (argc > 2) {
+      muon_file_name = argv[2];
+  }
+
+  std::cout<<">>> full_geom_v0: deal with random number settings..."<<std::endl;
   // Choose the Random engine
   G4Random::setTheEngine(new CLHEP::RanecuEngine);
   G4Random::showEngineStatus();
   int startRun = 2000010;
-  if (argc>3)
-      sscanf(argv[3], "%d", &startRun);
-  std::cout<<">>> simple_geom: Will use "<<startRun<<" start number in run sequence."<<std::endl;
+  if (argc>4)
+      sscanf(argv[4], "%d", &startRun);
+  std::cout<<">>> full_geom_v0: Will use "<<startRun<<" start number in run sequence."<<std::endl;
 
 
   // Construct the default run manager
@@ -91,11 +101,7 @@ int main(int argc,char** argv)
 
   // Set mandatory initialization classes
   //
-  // Detector construction
-  G4String material = "polyethylene_standard";
-  if (argc > 4)
-      material = argv[4];
-  DetectorConstruction* detconst = new DetectorConstruction(material);
+  DetectorConstruction* detconst = new DetectorConstruction();
   runManager->SetUserInitialization(detconst);
 
   // Physics list
@@ -103,18 +109,18 @@ int main(int argc,char** argv)
   physicsList->SetVerboseLevel(1);
   runManager->SetUserInitialization(physicsList);
 
-  // TString outfname("");
-  // AnaManager* anam = 0;
-  // if (argc>2) {
-  //     outfname = argv[2];
-  //     anam = new AnaManager(outfname);
-  // } else
-  //     anam = new AnaManager();
+  TString outfname("");
+  AnaManager* anam = 0;
+  if (argc>3) {
+      outfname = argv[3];
+      anam = new AnaManager(outfname);
+  } else
+      anam = new AnaManager();
 
-  // anam->Book();
+  anam->Book();
 
   // User action initialization
-  //runManager->SetUserInitialization(new ActionInitialization(detconst, anam));
+  runManager->SetUserInitialization(new ActionInitialization(detconst, muon_file_name, anam));
 
   // Initialize visualization
   //
