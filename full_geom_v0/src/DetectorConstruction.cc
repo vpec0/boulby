@@ -234,7 +234,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 			  false,                 //no boolean operation
 			  0,                     //copy number
 			  checkOverlaps);        //overlaps checking
-    std::cout<<"OCV_Z : "<<OCV_Z<<", OCV_H : "<<OCV_H<<std::endl;
+    std::cout<<"OCV_Z : "<<OCV_Z<<", OCV_H : "<<OCV_H<<", OCV_D : "<<OCV_D<<std::endl;
 
 
     //
