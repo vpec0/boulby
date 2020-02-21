@@ -34,7 +34,6 @@
 
 #include "G4RunManager.hh"
 #include "G4Run.hh"
-#include "G4AccumulableManager.hh"
 #include "G4LogicalVolumeStore.hh"
 #include "G4LogicalVolume.hh"
 #include "G4UnitsTable.hh"
@@ -65,10 +64,6 @@ RunAction::RunAction(AnaManager* anam)
   new G4UnitDefinition("nanogray" , "nanoGy"  , "Dose", nanogray);
   new G4UnitDefinition("picogray" , "picoGy"  , "Dose", picogray);
 
-  // Register accumulable to the accumulable manager
-  G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
-  accumulableManager->RegisterAccumulable(fEdep);
-  accumulableManager->RegisterAccumulable(fEdep2);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -84,10 +79,6 @@ void RunAction::BeginOfRunAction(const G4Run* run)
   G4RunManager::GetRunManager()->SetRandomNumberStore(false);
   //G4RunManager::GetRunManager()->RestoreRandomNumberStatus("currentRun.rndm");
 
-  // reset accumulables to their initial values
-  G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
-  accumulableManager->Reset();
-
   mRunID = run->GetRunID();
   mAnaM->mEvent.runNo = run->GetRunID();
 }
@@ -98,10 +89,6 @@ void RunAction::EndOfRunAction(const G4Run* run)
 {
   G4int nofEvents = run->GetNumberOfEvent();
   if (nofEvents == 0) return;
-
-  // Merge accumulables
-  G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
-  accumulableManager->Merge();
 
   // Compute dose = total energy deposit in a run and its variance
   //

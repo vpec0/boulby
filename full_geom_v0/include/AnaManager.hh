@@ -60,9 +60,6 @@ class AnaManager
     void FillHisto(G4int id, G4double bin, G4double weight = 1.0);
     void Normalize(G4int id, G4double fac);
 
-    void FillNtuple(G4double energyAbs, G4double energyGap,
-                    G4double trackLAbs, G4double trackLGap);
-
     void FillTree();
     void PrintStatistic();
     void Reset();
