@@ -154,9 +154,9 @@ int main(int argc,char** argv)
   // owned and deleted by the run manager, so they should not be deleted
   // in the main() program !
 
-  //anam->Save();
+  anam->Save();
+  delete anam;
 
-  //delete anam;
   //delete visManager;
   delete runManager;
   std::cout<<">>> simple_geom: end."<<std::endl;

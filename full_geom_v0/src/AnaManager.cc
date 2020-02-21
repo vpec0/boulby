@@ -72,7 +72,7 @@ AnaManager::AnaManager():
 
 AnaManager::~AnaManager()
 {
-    //if (fRootFile) delete fRootFile;
+    if (fRootFile) delete fRootFile;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -82,32 +82,32 @@ void AnaManager::Book()
   // Creating a tree container to handle histograms and ntuples.
   // This tree is associated to an output file.
   //
-  // fRootFile = new TFile(fFileName,"RECREATE");
-  // if (! fRootFile) {
-  //   G4cout << " AnaManager::Book :"
-  //          << " problem creating the ROOT TFile "
-  //          << G4endl;
-  //   return;
-  // }
+  fRootFile = new TFile(fFileName,"RECREATE");
+  if (! fRootFile) {
+    G4cout << " AnaManager::Book :"
+           << " problem creating the ROOT TFile "
+           << G4endl;
+    return;
+  }
 
-  // // create 1st ntuple
-  // fTree = AnaTree::createTree("events", mEvent);
-  // // have the tree saved every 20kB
-  // fTree->SetAutoSave(-20000);
+  // create 1st ntuple
+  fTree = AnaTree::createTree("events", mEvent);
+  // have the tree saved every 20kB
+  fTree->SetAutoSave(-20000);
 
-  // G4cout << "\n----> Output file is open in " << fFileName << G4endl;
+  G4cout << "\n----> Output file is open in " << fFileName << G4endl;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void AnaManager::Save()
 {
-  // if (! fRootFile) return;
+  if (! fRootFile) return;
 
-  // fRootFile->Write();       // Writing the histograms to the file
-  // fRootFile->Close();       // and closing the tree (and the file)
+  fRootFile->Write();       // Writing the histograms to the file
+  fRootFile->Close();       // and closing the tree (and the file)
 
-  // G4cout << "\n----> Histograms and ntuples are saved\n" << G4endl;
+  G4cout << "\n----> Histograms and ntuples are saved\n" << G4endl;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -141,8 +141,7 @@ void AnaManager::Normalize(G4int ih, G4double fac)
 void AnaManager::FillTree()
 {
     // do any event filtering here
-
-    // fTree->Fill();
+    fTree->Fill();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
