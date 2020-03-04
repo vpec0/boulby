@@ -162,7 +162,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 			  false,                 //no boolean operation
 			  0,                     //copy number
 			  checkOverlaps);        //overlaps checking
-    std::cout<<"STEEL_Z : "<<STEEL_Z<<", STEEL_H : "<<STEEL_H<<std::endl;
+    std::cout<<"STEEL_Z : "<<STEEL_Z<<", STEEL_H : "<<STEEL_H<<", STEEL_D : "<<STEEL_D<<std::endl;
 
 
     //
@@ -187,6 +187,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 			  0,                     //copy number
 			  checkOverlaps);        //overlaps checking
     std::cout<<"WT_Z : "<<WT_Z<<", WT_H : "<<WT_H<<std::endl;
+    std::cout<<"WT_Z : "<<WT_Z<<", WT_H : "<<WT_H<<", WT_D : "<<WT_D<<std::endl;
 
     //
     // Gd Doped Liquid Scintillator
@@ -209,7 +210,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 			  false,                 //no boolean operation
 			  0,                     //copy number
 			  checkOverlaps);        //overlaps checking
-    std::cout<<"GDLS_Z : "<<GDLS_Z<<", GDLS_H : "<<GDLS_H<<std::endl;
+    std::cout<<"GDLS_Z : "<<GDLS_Z<<", GDLS_H : "<<GDLS_H<<", GDLS_D : "<<GDLS_D<<std::endl;
 
 
     //
@@ -258,6 +259,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 			  false,                 //no boolean operation
 			  0,                     //copy number
 			  checkOverlaps);        //overlaps checking
+    std::cout<<"VAC_Z : "<<VAC_Z<<", VAC_H : "<<VAC_H<<", VAC_D : "<<VAC_D<<std::endl;
 
     //
     // Inner Cryostat Vessel
@@ -281,6 +283,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 			  false,                 //no boolean operation
 			  0,                     //copy number
 			  checkOverlaps);        //overlaps checking
+    std::cout<<"ICV_Z : "<<ICV_Z<<", ICV_H : "<<ICV_H<<", ICV_D : "<<ICV_D<<std::endl;
 
 
     //
@@ -306,6 +309,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 			  false,                 //no boolean operation
 			  0,                     //copy number
 			  checkOverlaps);        //overlaps checking
+    std::cout<<"ID_ENV_Z : "<<ID_ENV_Z<<", ID_ENV_H : "<<ID_ENV_H<<", ID_ENV_D : "<<ID_ENV_D<<std::endl;
 
     //
     // Dome - GXe top part in the cryostat
