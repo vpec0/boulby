@@ -121,7 +121,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     muon = fMuons[entry];
 
 
-    G4ThreeVector pos(muon.posX*0.5, muon.posY*0.5, muon.posZ);
+    G4ThreeVector pos(muon.posX, muon.posY, muon.posZ);
     pos = pos * CLHEP::cm;
 
     fParticleGun->
