@@ -120,7 +120,7 @@ int main(int argc,char** argv)
   anam->Book();
 
   // User action initialization
-  runManager->SetUserInitialization(new ActionInitialization(detconst, muon_file_name, anam));
+  runManager->SetUserInitialization(new ActionInitialization(detconst, muon_file_name));
 
   // Initialize visualization
   //

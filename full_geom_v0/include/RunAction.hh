@@ -46,7 +46,7 @@ class AnaManager;
 class RunAction : public G4UserRunAction
 {
   public:
-    RunAction(AnaManager*);
+    RunAction();
     virtual ~RunAction();
 
     // virtual G4Run* GenerateRun();
@@ -59,10 +59,10 @@ class RunAction : public G4UserRunAction
     G4Accumulable<G4double> fEdep;
     G4Accumulable<G4double> fEdep2;
 
-    AnaManager* mAnaM;
+    AnaManager* fAnaM;
 
 public:
-    G4int mRunID;
+    G4int fRunID;
 };
 
 #endif

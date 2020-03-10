@@ -43,7 +43,7 @@ class AnaManager;
 class ActionInitialization : public G4VUserActionInitialization
 {
   public:
-    ActionInitialization(DetectorConstruction*, G4String, AnaManager*);
+    ActionInitialization(DetectorConstruction*, G4String);
     virtual ~ActionInitialization();
 
     virtual void BuildForMaster() const;

@@ -42,7 +42,7 @@ class AnaManager;
 class EventAction : public G4UserEventAction
 {
   public:
-    EventAction(RunAction* runAction, AnaManager*);
+    EventAction();
     virtual ~EventAction();
 
     virtual void BeginOfEventAction(const G4Event* event);
@@ -55,7 +55,7 @@ class EventAction : public G4UserEventAction
   private:
     RunAction* fRunAction;
     G4double     fEdep;
-    AnaManager* mAnaM;
+    AnaManager* fAnaM;
 
     G4int fRunVerboseLevel;
 };

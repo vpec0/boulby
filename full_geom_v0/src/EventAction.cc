@@ -1,32 +1,3 @@
-//
-// ********************************************************************
-// * License and Disclaimer                                           *
-// *                                                                  *
-// * The  Geant4 software  is  copyright of the Copyright Holders  of *
-// * the Geant4 Collaboration.  It is provided  under  the terms  and *
-// * conditions of the Geant4 Software License,  included in the file *
-// * LICENSE and available at  http://cern.ch/geant4/license .  These *
-// * include a list of copyright holders.                             *
-// *                                                                  *
-// * Neither the authors of this software system, nor their employing *
-// * institutes,nor the agencies providing financial support for this *
-// * work  make  any representation or  warranty, express or implied, *
-// * regarding  this  software system or assume any liability for its *
-// * use.  Please see the license in the file  LICENSE  and URL above *
-// * for the full disclaimer and the limitation of liability.         *
-// *                                                                  *
-// * This  code  implementation is the result of  the  scientific and *
-// * technical work of the GEANT4 collaboration.                      *
-// * By using,  copying,  modifying or  distributing the software (or *
-// * any work based  on the software)  you  agree  to acknowledge its *
-// * use  in  resulting  scientific  publications,  and indicate your *
-// * acceptance of all terms of the Geant4 Software license.          *
-// ********************************************************************
-//
-//
-/// \file EventAction.cc
-/// \brief Implementation of the EventAction class
-
 #include "EventAction.hh"
 #include "RunAction.hh"
 
@@ -38,14 +9,16 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-EventAction::EventAction(RunAction* runAction, AnaManager* anam)
+EventAction::EventAction()
 : G4UserEventAction(),
-  fRunAction(runAction),
-  fEdep(0.),
-  mAnaM(anam)
+  fEdep(0.)
 {
     fRunVerboseLevel = G4RunManager::GetRunManager()->GetVerboseLevel();
     G4cout<<"EventAction: Setting Run Verbose Level to: "<<fRunVerboseLevel<<G4endl;
+
+    fRunAction = (RunAction*)G4RunManager::GetRunManager()->GetUserRunAction();
+
+    fAnaM = AnaManager::GetManager();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -94,20 +67,36 @@ void EventAction::BeginOfEventAction(const G4Event* evt)
     // }
     //G4RunManager::GetRunManager()->RestoreRandomNumberStatus("currentEvent.rndm");
 
-  fEdep = 0.;
-  mAnaM->Reset();
-  mAnaM->mEvent.runNo = fRunAction->mRunID;
-  mAnaM->mEvent.eventNo = evt->GetEventID();
+    fEdep = 0.;
+    fAnaM->Reset();
+    fAnaM->fEvent.runNo = fRunAction->fRunID;
+    fAnaM->fEvent.eventNo = evt->GetEventID();
+
+    // store primary particle info
+    const G4PrimaryParticle* primary = evt->GetPrimaryVertex()->GetPrimary();
+    fAnaM->fEvent.mu_en = primary->GetTotalEnergy() / CLHEP::GeV;
+    G4ThreeVector mom_dir = primary->GetMomentumDirection();
+    fAnaM->fEvent.mu_cosz = mom_dir.cosTheta();
+    fAnaM->fEvent.mu_phi = mom_dir.phi();
+
+    G4ThreeVector pos = evt->GetPrimaryVertex()->GetPosition();
+    pos /= CLHEP::cm;
+    fAnaM->fEvent.mu_startx = pos.x();
+    fAnaM->fEvent.mu_starty = pos.y();
+    fAnaM->fEvent.mu_startz = pos.z();
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void EventAction::EndOfEventAction(const G4Event*)
 {
-  // accumulate statistics in run action
+  // accumulate neutron statistics in run action
   fRunAction->AddEdep(fEdep);
-  if (mAnaM->mEvent.n_neutrons > 0)
-      mAnaM -> FillTree();
+  fAnaM -> FillTree();
+
+  // process SD hit collections
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

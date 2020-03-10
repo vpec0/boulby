@@ -34,6 +34,8 @@
 #include "G4ParticleGun.hh"
 #include "globals.hh"
 
+#include "AnaManager.hh"
+
 class G4ParticleGun;
 class G4Event;
 class G4Box;
@@ -89,6 +91,8 @@ private:
     std::vector<Muon_t> fMuons;
 
     G4ParticleTable* fParticleTable;
+
+    AnaManager* fAnaM;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

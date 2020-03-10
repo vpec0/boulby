@@ -1,33 +1,3 @@
-//
-// ********************************************************************
-// * License and Disclaimer                                           *
-// *                                                                  *
-// * The  Geant4 software  is  copyright of the Copyright Holders  of *
-// * the Geant4 Collaboration.  It is provided  under  the terms  and *
-// * conditions of the Geant4 Software License,  included in the file *
-// * LICENSE and available at  http://cern.ch/geant4/license .  These *
-// * include a list of copyright holders.                             *
-// *                                                                  *
-// * Neither the authors of this software system, nor their employing *
-// * institutes,nor the agencies providing financial support for this *
-// * work  make  any representation or  warranty, express or implied, *
-// * regarding  this  software system or assume any liability for its *
-// * use.  Please see the license in the file  LICENSE  and URL above *
-// * for the full disclaimer and the limitation of liability.         *
-// *                                                                  *
-// * This  code  implementation is the result of  the  scientific and *
-// * technical work of the GEANT4 collaboration.                      *
-// * By using,  copying,  modifying or  distributing the software (or *
-// * any work based  on the software)  you  agree  to acknowledge its *
-// * use  in  resulting  scientific  publications,  and indicate your *
-// * acceptance of all terms of the Geant4 Software license.          *
-// ********************************************************************
-//
-//
-//
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 #ifndef AnaManager_h
 #define AnaManager_h 1
 
@@ -49,6 +19,20 @@ const G4int kMaxHisto = 4;
 
 class AnaManager
 {
+public:
+    enum {
+	kEm=0,
+	kNonEm
+    };
+
+    enum {
+	kTpc=0,
+	kRfr,
+	kGdls,
+	kWt,
+	kNdetectors
+    };
+
   public:
     AnaManager();
     AnaManager(const char*);
@@ -64,6 +48,14 @@ class AnaManager
     void PrintStatistic();
     void Reset();
 
+    // setters and getters
+    // set or get energy deposit by EM or NonEM, and by detector
+    void SetEdep(Double_t, Double_t, Double_t, Int_t);
+    //Double_t* GetEdep(Int_t, Int_t);
+
+public:
+    static AnaManager* GetManager() {return fgManager;}
+
 
   private:
     TString  fFileName;
@@ -78,8 +70,12 @@ class AnaManager
     G4double fLgap;
 
 public:
-    AnaTree::Event_t mEvent;
-    int mWarningMessageCount;
+    AnaTree::Event_t fEvent;
+    int fWarningMessageCount;
+
+private:
+    static AnaManager* fgManager;
+
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

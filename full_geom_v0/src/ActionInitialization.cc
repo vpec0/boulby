@@ -39,13 +39,15 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 ActionInitialization::ActionInitialization(DetectorConstruction* detconst,
-					   G4String muon_file_name,
-					   AnaManager* anam)
+					   G4String muon_file_name)
     : G4VUserActionInitialization(),
-      mAnaM(anam),
       mDetConst(detconst),
       mMuonFileName(muon_file_name)
-{}
+{
+    if (!AnaManager::GetManager())
+	new AnaManager();
+    mAnaM = AnaManager::GetManager();
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -56,7 +58,7 @@ ActionInitialization::~ActionInitialization()
 
 void ActionInitialization::BuildForMaster() const
 {
-    RunAction* runAction = new RunAction(mAnaM);
+    RunAction* runAction = new RunAction();
   SetUserAction(runAction);
 }
 
@@ -66,16 +68,17 @@ void ActionInitialization::Build() const
 {
     SetUserAction(new PrimaryGeneratorAction(mMuonFileName, -1, 0));
 
-  RunAction* runAction = new RunAction (mAnaM);
+  RunAction* runAction = new RunAction ();
   SetUserAction(runAction);
 
-  EventAction* eventAction = new EventAction(runAction, mAnaM);
+  EventAction* eventAction = new EventAction();
   SetUserAction(eventAction);
 
 
-  SetUserAction(new TrackingAction(mDetConst, mAnaM));
+  SetUserAction(new TrackingAction());
 
-  SetUserAction(new SteppingAction(eventAction));
+  // disable this. No need to use, will be using SensitiveDetector
+  // SetUserAction(new SteppingAction());
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

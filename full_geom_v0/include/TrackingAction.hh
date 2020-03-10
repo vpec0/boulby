@@ -42,7 +42,7 @@ class DetectorConstruction;
 class TrackingAction : public G4UserTrackingAction {
 
   public:
-    TrackingAction(DetectorConstruction*, AnaManager*);
+    TrackingAction();
 
    ~TrackingAction() {};
 
@@ -51,7 +51,7 @@ class TrackingAction : public G4UserTrackingAction {
 
   private:
     DetectorConstruction*   detector;
-    AnaManager* mAnaM;
+    AnaManager* fAnaM;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -45,12 +45,11 @@
 
 class EventAction;
 
-RunAction::RunAction(AnaManager* anam)
+RunAction::RunAction()
 : G4UserRunAction(),
   fEdep(0.),
   fEdep2(0.),
-  mAnaM(anam),
-  mRunID(0)
+  fRunID(0)
 {
   // add new units for dose
   //
@@ -64,6 +63,7 @@ RunAction::RunAction(AnaManager* anam)
   new G4UnitDefinition("nanogray" , "nanoGy"  , "Dose", nanogray);
   new G4UnitDefinition("picogray" , "picoGy"  , "Dose", picogray);
 
+  fAnaM = AnaManager::GetManager();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -79,8 +79,8 @@ void RunAction::BeginOfRunAction(const G4Run* run)
   G4RunManager::GetRunManager()->SetRandomNumberStore(false);
   //G4RunManager::GetRunManager()->RestoreRandomNumberStatus("currentRun.rndm");
 
-  mRunID = run->GetRunID();
-  mAnaM->mEvent.runNo = run->GetRunID();
+  fRunID = run->GetRunID();
+  fAnaM->fEvent.runNo = run->GetRunID();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

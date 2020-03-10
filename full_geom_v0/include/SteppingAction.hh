@@ -38,12 +38,12 @@ class EventAction;
 class G4LogicalVolume;
 
 /// Stepping action class
-/// 
+///
 
 class SteppingAction : public G4UserSteppingAction
 {
   public:
-    SteppingAction(EventAction* eventAction);
+    SteppingAction();
     virtual ~SteppingAction();
 
     // method from the base class

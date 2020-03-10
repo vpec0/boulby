@@ -1,35 +1,3 @@
-//
-// ********************************************************************
-// * License and Disclaimer                                           *
-// *                                                                  *
-// * The  Geant4 software  is  copyright of the Copyright Holders  of *
-// * the Geant4 Collaboration.  It is provided  under  the terms  and *
-// * conditions of the Geant4 Software License,  included in the file *
-// * LICENSE and available at  http://cern.ch/geant4/license .  These *
-// * include a list of copyright holders.                             *
-// *                                                                  *
-// * Neither the authors of this software system, nor their employing *
-// * institutes,nor the agencies providing financial support for this *
-// * work  make  any representation or  warranty, express or implied, *
-// * regarding  this  software system or assume any liability for its *
-// * use.  Please see the license in the file  LICENSE  and URL above *
-// * for the full disclaimer and the limitation of liability.         *
-// *                                                                  *
-// * This  code  implementation is the result of  the  scientific and *
-// * technical work of the GEANT4 collaboration.                      *
-// * By using,  copying,  modifying or  distributing the software (or *
-// * any work based  on the software)  you  agree  to acknowledge its *
-// * use  in  resulting  scientific  publications,  and indicate your *
-// * acceptance of all terms of the Geant4 Software license.          *
-// ********************************************************************
-//
-/// \file analysis/AnaEx02/src/AnaManager.cc
-/// \brief Implementation of the AnaManager class
-//
-//
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 #include <TH1D.h>
 #include <TFile.h>
 #include <TTree.h>
@@ -41,14 +9,18 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+AnaManager* AnaManager::fgManager = 0;
+
+
 AnaManager::AnaManager(const char* filename):
         fFileName(filename),
 	fRootFile(0),
 	fHisto {},
 	fTree(0),
-	fEabs(0.), fEgap(0.) ,fLabs(0.), fLgap(0.), mEvent(),
-	mWarningMessageCount(0)
+	fEabs(0.), fEgap(0.) ,fLabs(0.), fLgap(0.), fEvent(),
+	fWarningMessageCount(0)
 {
+    fgManager = this;
 
   // histograms
   //for (G4int k=0; k<kMaxHisto; k++) fHisto[k] = 0;
@@ -60,8 +32,9 @@ AnaManager::AnaManager():
     fRootFile(0),
     fHisto {},
     fTree(0),
-    fEabs(0.), fEgap(0.) ,fLabs(0.), fLgap(0.), mEvent()
+    fEabs(0.), fEgap(0.) ,fLabs(0.), fLgap(0.), fEvent()
 {
+    fgManager = this;
 
   // histograms
   //for (G4int k=0; k<kMaxHisto; k++) fHisto[k] = 0;
@@ -91,7 +64,7 @@ void AnaManager::Book()
   }
 
   // create 1st ntuple
-  fTree = AnaTree::createTree("events", mEvent);
+  fTree = AnaTree::createTree("events", fEvent);
   // have the tree saved every 20kB
   fTree->SetAutoSave(-20000);
 
@@ -168,7 +141,48 @@ void AnaManager::PrintStatistic()
 
 void AnaManager::Reset()
 {
-    AnaTree::resetEvent(mEvent);
+    AnaTree::resetEvent(fEvent);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+/// Setters and getters
+
+void AnaManager::SetEdep(Double_t time, Double_t Edep_em, Double_t Edep_nonem, Int_t detector)
+{
+    Int_t& n = *(&fEvent.n_tpc + detector);
+
+    Double_t* times = fEvent.Tdep_tpc
+	+ detector*AnaTree::MAX_DEPOSITIONS;
+    times[n] = time;
+
+    Double_t* Edeps = fEvent.Edep_tpc_em
+	+ detector*AnaTree::MAX_DEPOSITIONS;
+    Edeps[n] = Edep_em;
+    // std::cout<<"Added Edep_em "<<Edeps[n]<<" at position"<<n<<std::endl;
+
+    Edeps = fEvent.Edep_tpc_nonem
+	+ detector*AnaTree::MAX_DEPOSITIONS;
+    Edeps[n] = Edep_nonem;
+    // std::cout<<"Added Edep_nonem "<<Edeps[n]<<" at position"<<n<<std::endl;
+
+    ++n;
+
+    // std::cout<<"Event "<<fEvent.eventNo<<std::endl;
+    // std::cout<<"TPC N: "<<fEvent.n_tpc<<", EM E: "<<fEvent.Edep_tpc_em[fEvent.n_tpc-1]
+    // 	     <<", RFR N: "<<fEvent.n_rfr<<", EM E: "<<fEvent.Edep_rfr_em[fEvent.n_rfr-1]
+    // 	     <<", GDLS N: "<<fEvent.n_gdls<<", EM E: "<<fEvent.Edep_gdls_em[fEvent.n_gdls-1]
+    // 	     <<", WT N: "<<fEvent.n_wt<<", EM E: "<<fEvent.Edep_wt_em[fEvent.n_wt-1]<<std::endl;
+}
+
+
+// Double_t AnaManager::GetEdep(Int_t em, Int_t detector)
+// {
+//     Int_t& n = *(&fEvent.n_tpc_em + 4*(em==kEm) + detector);
+
+//     Double_t* Edeps = fEvent.Edep_tpc_em
+// 	+ 4*(em==kEm)*AnaTree::MAX_DEPOSITIONS
+// 	+ detector*AnaTree::MAX_DEPOSITIONS;
+
+//     return Edeps[n];
+// }

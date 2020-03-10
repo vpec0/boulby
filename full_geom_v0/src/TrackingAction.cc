@@ -40,9 +40,12 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-TrackingAction::TrackingAction(DetectorConstruction* det, AnaManager* anam)
-    :G4UserTrackingAction(),detector(det), mAnaM(anam)
-{ }
+TrackingAction::TrackingAction()
+    :G4UserTrackingAction()
+{
+    detector = (DetectorConstruction*)G4RunManager::GetRunManager()->GetUserDetectorConstruction();
+    fAnaM = AnaManager::GetManager();
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -51,34 +54,34 @@ void TrackingAction::PreUserTrackingAction(const G4Track* trk)
     // Check if this is a neutron
     if (trk->GetParticleDefinition()->GetPDGEncoding() != 2112) return;
 
-    if ( mAnaM->mEvent.n_neutrons >= AnaTree::MAX_NEUTRONS ) {
+    if ( fAnaM->fEvent.n_neutrons >= AnaTree::MAX_NEUTRONS ) {
 	// we don't have enough capacity allocated to store more
 	// print out a warning message and don't record the neutron
-	if (mAnaM->mWarningMessageCount < 1) {
+	if (fAnaM->fWarningMessageCount < 1) {
 	    std::cerr<<"WARNING: TrackingAction::PreUserTrackingAction(): "
-		     <<"run "<<mAnaM->mEvent.runNo
-		     <<" event "<<mAnaM->mEvent.eventNo
+		     <<"run "<<fAnaM->fEvent.runNo
+		     <<" event "<<fAnaM->fEvent.eventNo
 		     <<"reached a hardcoded limit of neutrons to be stored: "
 		     << AnaTree::MAX_NEUTRONS << std::endl
 		     <<"         Will not store any more neutrons in this event ("
-		     <<mAnaM->mEvent.runNo<<", "
-		     <<mAnaM->mEvent.eventNo<<")." << std::endl;
-	    mAnaM->mWarningMessageCount++;
+		     <<fAnaM->fEvent.runNo<<", "
+		     <<fAnaM->fEvent.eventNo<<")." << std::endl;
+	    fAnaM->fWarningMessageCount++;
 	}
 	return;
     }
 
     // count the neutron and record its initial energy, start
     // position, end position, creation process, and parent id
-    int n = mAnaM->mEvent.n_neutrons;
-    mAnaM->mEvent.n_energy[n] = trk->GetKineticEnergy() / CLHEP::MeV;
-    mAnaM->mEvent.start_xyz[n][0] = trk->GetVertexPosition().getX()/CLHEP::cm;
-    mAnaM->mEvent.start_xyz[n][1] = trk->GetVertexPosition().getY()/CLHEP::cm;
-    mAnaM->mEvent.start_xyz[n][2] = trk->GetVertexPosition().getZ()/CLHEP::cm;
+    int n = fAnaM->fEvent.n_neutrons;
+    fAnaM->fEvent.n_energy[n] = trk->GetKineticEnergy() / CLHEP::MeV;
+    fAnaM->fEvent.start_xyz[n][0] = trk->GetVertexPosition().getX()/CLHEP::cm;
+    fAnaM->fEvent.start_xyz[n][1] = trk->GetVertexPosition().getY()/CLHEP::cm;
+    fAnaM->fEvent.start_xyz[n][2] = trk->GetVertexPosition().getZ()/CLHEP::cm;
 
-    mAnaM->mEvent.process->push_back(trk->GetCreatorProcess()->GetProcessName());
-    mAnaM->mEvent.trackId[n] = trk->GetTrackID();
-    mAnaM->mEvent.parentId[n] = trk->GetParentID();
+    fAnaM->fEvent.process->push_back(trk->GetCreatorProcess()->GetProcessName());
+    fAnaM->fEvent.trackId[n] = trk->GetTrackID();
+    fAnaM->fEvent.parentId[n] = trk->GetParentID();
 
 }
 
@@ -86,22 +89,36 @@ void TrackingAction::PreUserTrackingAction(const G4Track* trk)
 
 void TrackingAction::PostUserTrackingAction(const G4Track* trk)
 {
+    int pdg = trk->GetParticleDefinition()->GetPDGEncoding();
+    int trkId = trk->GetTrackID();
+    int mother = trk->GetParentID();
+    // store primary muon last position
+    if (mother == 0) {
+	// this is a primary particle
+	fAnaM->fEvent.mu_endx = trk->GetPosition().getX()/CLHEP::cm;
+	fAnaM->fEvent.mu_endy = trk->GetPosition().getY()/CLHEP::cm;
+	fAnaM->fEvent.mu_endz = trk->GetPosition().getZ()/CLHEP::cm;
+
+	fAnaM->fEvent.mu_len = trk->GetTrackLength()/CLHEP::cm;
+    }
+
     // Check if this is a neutron
-    if (trk->GetParticleDefinition()->GetPDGEncoding() != 2112) return;
-    if ( mAnaM->mEvent.n_neutrons >= AnaTree::MAX_NEUTRONS ) {
+    if (pdg != 2112) return;
+    if ( fAnaM->fEvent.n_neutrons >= AnaTree::MAX_NEUTRONS ) {
 	// we don't have enough capacity allocated to store more
-	mAnaM->mEvent.n_neutrons_total++;
+	fAnaM->fEvent.n_neutrons_total++;
 	return;
     }
 
-    int n = mAnaM->mEvent.n_neutrons;
+    int n = fAnaM->fEvent.n_neutrons;
 
-    mAnaM->mEvent.end_xyz[n][0] = trk->GetPosition().getX()/CLHEP::cm;
-    mAnaM->mEvent.end_xyz[n][1] = trk->GetPosition().getY()/CLHEP::cm;
-    mAnaM->mEvent.end_xyz[n][2] = trk->GetPosition().getZ()/CLHEP::cm;
+    fAnaM->fEvent.end_xyz[n][0] = trk->GetPosition().getX()/CLHEP::cm;
+    fAnaM->fEvent.end_xyz[n][1] = trk->GetPosition().getY()/CLHEP::cm;
+    fAnaM->fEvent.end_xyz[n][2] = trk->GetPosition().getZ()/CLHEP::cm;
 
-    mAnaM->mEvent.n_neutrons_total++;
-    mAnaM->mEvent.n_neutrons++;
+    fAnaM->fEvent.n_neutrons_total++;
+    fAnaM->fEvent.n_neutrons++;
+
 
 }
 
