@@ -538,6 +538,10 @@ void DetectorConstruction::ConstructSDandField()
     G4SDManager::GetSDMpointer()->AddNewDetector(sd_rfr);
     SetSensitiveDetector("RFR", sd_rfr);
 
+    SD* sd_skin = new SD("sdSkin","skin", AnaManager::kSkin);
+    G4SDManager::GetSDMpointer()->AddNewDetector(sd_skin);
+    SetSensitiveDetector("Skin", sd_skin);
+
     SD* sd_gdls = new SD("sdGdls","gdls", AnaManager::kGdls);
     G4SDManager::GetSDMpointer()->AddNewDetector(sd_gdls);
     SetSensitiveDetector("GdLS", sd_gdls);

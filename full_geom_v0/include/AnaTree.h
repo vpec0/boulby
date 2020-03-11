@@ -44,21 +44,25 @@ namespace AnaTree {
 #define DEPOSITS_LIST				\
     INT(n_tpc);					\
     INT(n_rfr);					\
+    INT(n_skin);				\
     INT(n_gdls);				\
     INT(n_wt);					\
 						\
     DOUBLE_ARR(Tdep_tpc, n_tpc);		\
     DOUBLE_ARR(Tdep_rfr, n_rfr);		\
+    DOUBLE_ARR(Tdep_skin, n_skin);		\
     DOUBLE_ARR(Tdep_gdls, n_gdls);		\
     DOUBLE_ARR(Tdep_wt, n_wt);			\
     					     	\
     DOUBLE_ARR(Edep_tpc_em, n_tpc);		\
     DOUBLE_ARR(Edep_rfr_em, n_rfr);		\
+    DOUBLE_ARR(Edep_skin_em, n_skin);		\
     DOUBLE_ARR(Edep_gdls_em, n_gdls);		\
     DOUBLE_ARR(Edep_wt_em, n_wt);		\
     						\
     DOUBLE_ARR(Edep_tpc_nonem, n_tpc);		\
     DOUBLE_ARR(Edep_rfr_nonem, n_rfr);		\
+    DOUBLE_ARR(Edep_skin_nonem, n_skin);	\
     DOUBLE_ARR(Edep_gdls_nonem, n_gdls);	\
     DOUBLE_ARR(Edep_wt_nonem, n_wt)		\
 
