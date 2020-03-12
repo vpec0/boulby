@@ -13,12 +13,13 @@ AnaManager* AnaManager::fgManager = 0;
 
 
 AnaManager::AnaManager(const char* filename):
-        fFileName(filename),
-	fRootFile(0),
-	fHisto {},
-	fTree(0),
-	fEabs(0.), fEgap(0.) ,fLabs(0.), fLgap(0.), fEvent(),
-	fWarningMessageCount(0)
+    fFileName(filename),
+    fRootFile(0),
+    fHisto {},
+    fTree(0),
+    fEabs(0.), fEgap(0.) ,fLabs(0.), fLgap(0.), fEvent(),
+    fWarningMessageCount(0),
+    fTrkPdg {}
 {
     fgManager = this;
 
@@ -32,7 +33,8 @@ AnaManager::AnaManager():
     fRootFile(0),
     fHisto {},
     fTree(0),
-    fEabs(0.), fEgap(0.) ,fLabs(0.), fLgap(0.), fEvent()
+    fEabs(0.), fEgap(0.) ,fLabs(0.), fLgap(0.), fEvent(),
+    fTrkPdg {}
 {
     fgManager = this;
 

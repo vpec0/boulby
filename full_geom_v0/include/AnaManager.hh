@@ -14,6 +14,7 @@ class TTree;
 class TH1D;
 
 const G4int kMaxHisto = 4;
+const G4int kMaxG4Tracks = 200000;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -28,6 +29,7 @@ public:
     enum {
 	kTpc=0,
 	kRfr,
+	kSkin,
 	kGdls,
 	kWt,
 	kNdetectors
@@ -53,6 +55,9 @@ public:
     void SetEdep(Double_t, Double_t, Double_t, Int_t);
     //Double_t* GetEdep(Int_t, Int_t);
 
+    void AddTrkPdg(G4int trkId, G4int pdg) { fTrkPdg[trkId] = pdg; }
+    G4int GetTrkPdg(G4int trkId) { return fTrkPdg[trkId]; }
+
 public:
     static AnaManager* GetManager() {return fgManager;}
 
@@ -68,6 +73,9 @@ public:
     G4double fEgap;
     G4double fLabs;
     G4double fLgap;
+
+    G4int fTrkPdg[kMaxG4Tracks];
+
 
 public:
     AnaTree::Event_t fEvent;
