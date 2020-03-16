@@ -7,6 +7,9 @@
 
 #include "AnaTree.h"
 
+#include <TH1F.h>
+
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 class TFile;
@@ -35,6 +38,10 @@ public:
 	kNdetectors
     };
 
+    const char* DetectorNames[kNdetectors] = {
+	"TPC", "RFR", "Skin", "Scint", "WT"
+    };
+
   public:
     AnaManager();
     AnaManager(const char*);
@@ -54,6 +61,9 @@ public:
     // set or get energy deposit by EM or NonEM, and by detector
     void SetEdep(Double_t, Double_t, Double_t, Int_t);
     //Double_t* GetEdep(Int_t, Int_t);
+    void FillPDGEdep(Int_t detector, Int_t pdg, Double_t Edep) {
+	fHisto[detector]->Fill(Form("%d", pdg), Edep); }
+
 
     void AddTrkPdg(G4int trkId, G4int pdg) { fTrkPdg[trkId] = pdg; }
     G4int GetTrkPdg(G4int trkId) { return fTrkPdg[trkId]; }
@@ -65,7 +75,7 @@ public:
   private:
     TString  fFileName;
     TFile*   fRootFile;
-    TH1D*    fHisto[kMaxHisto];
+    TH1F*    fHisto[kNdetectors];
     TTree*   fTree;
 
 

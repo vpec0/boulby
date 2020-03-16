@@ -1,4 +1,4 @@
-#include <TH1D.h>
+#include <TH1F.h>
 #include <TFile.h>
 #include <TTree.h>
 #include <CLHEP/Units/SystemOfUnits.h>
@@ -69,6 +69,13 @@ void AnaManager::Book()
   fTree = AnaTree::createTree("events", fEvent);
   // have the tree saved every 20kB
   fTree->SetAutoSave(-20000);
+
+
+  // create a histogram to save pdg of particles which deposit energy
+  for (int i = 0; i < kNdetectors; ++i) {
+      fHisto[i] = new TH1F(Form("h%s", DetectorNames[i]),
+			   ";Particle PDG; Energy deposited [MeV]", 1, 0,-1.);
+  }
 
   G4cout << "\n----> Output file is open in " << fFileName << G4endl;
 }

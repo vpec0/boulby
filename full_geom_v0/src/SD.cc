@@ -94,6 +94,9 @@ G4bool SD::ProcessHits(G4Step* aStep,
 
   fHitsCollection->insert( newHit );
 
+  // fill the histogram
+  fAnaM->FillPDGEdep(fDetector, pdg, edep);
+
   // G4double nonionidep = aStep->GetNonIonizingEnergyDeposit();
   // std::cout<<pdg<<" hit at ("
   // 	   <<aStep->GetPostStepPoint()->GetPosition().x()<<","
