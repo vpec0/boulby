@@ -113,6 +113,22 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
     G4int eventNo = anEvent->GetEventID();
 
+
+    if (!fMuonFile) {
+	G4ThreeVector pos(0.,0.,0.);
+
+	fParticleGun->
+	    SetParticleDefinition(fParticleTable->FindParticle(2112));
+
+	fParticleGun->SetParticlePosition(pos);
+	fParticleGun->SetParticleEnergy(20.*CLHEP::MeV);
+	fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0,0,-1));
+
+	fParticleGun->GeneratePrimaryVertex(anEvent);
+
+	return;
+    }
+
     Muon_t muon;
 
     G4int size = fMuons.size();

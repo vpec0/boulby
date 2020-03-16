@@ -42,7 +42,9 @@ ActionInitialization::ActionInitialization(DetectorConstruction* detconst,
 					   G4String muon_file_name)
     : G4VUserActionInitialization(),
       mDetConst(detconst),
-      mMuonFileName(muon_file_name)
+      mMuonFileName(muon_file_name),
+      fStartEvent(0),
+      fNevents(0)
 {
     if (!AnaManager::GetManager())
 	new AnaManager();
@@ -66,7 +68,8 @@ void ActionInitialization::BuildForMaster() const
 
 void ActionInitialization::Build() const
 {
-    SetUserAction(new PrimaryGeneratorAction(mMuonFileName, -1, 0));
+    //SetUserAction(new PrimaryGeneratorAction(mMuonFileName, fNevents, fStartEvent));
+    SetUserAction(new PrimaryGeneratorAction()); // generate single neutron in the centre of the TPC
 
   RunAction* runAction = new RunAction ();
   SetUserAction(runAction);

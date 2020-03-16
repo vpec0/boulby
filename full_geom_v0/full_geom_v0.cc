@@ -56,6 +56,8 @@ int main(int argc,char** argv)
  *   2: string;  generator file
  *   3: string;  output file
  *   4: integer; Start run
+ *   5: integer; start event from which to read in from muon flux file
+ *   6: integer; number of events to read in from the flux file
  **/
 {
   std::cout<<">>> simple_geom: begin."<<std::endl;
@@ -120,7 +122,19 @@ int main(int argc,char** argv)
   anam->Book();
 
   // User action initialization
-  runManager->SetUserInitialization(new ActionInitialization(detconst, muon_file_name));
+  auto uai = new ActionInitialization(detconst, muon_file_name);
+  // set parameters for reading in from the muon flux file
+  G4int startEvent = 0;
+  if (argc > 5)
+      sscanf(argv[5], "%d", &startEvent);
+  uai->SetStartEvent(startEvent);
+  G4int nEvents = -1; // default read all
+  if (argc > 6)
+      sscanf(argv[6], "%d", &nEvents);
+  uai->SetNevents(nEvents);
+
+  runManager->SetUserInitialization(uai);
+
 
   // Initialize visualization
   //

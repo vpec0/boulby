@@ -49,10 +49,16 @@ class ActionInitialization : public G4VUserActionInitialization
     virtual void BuildForMaster() const;
     virtual void Build() const;
 
+    void SetStartEvent(G4int evt) { fStartEvent = evt; }
+    void SetNevents(G4int nevts) { fNevents = nevts; }
+
 private:
     AnaManager* mAnaM;
     DetectorConstruction* mDetConst;
     G4String mMuonFileName;
+
+    G4int fStartEvent;
+    G4int fNevents;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
