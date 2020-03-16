@@ -79,7 +79,11 @@ void TrackingAction::PreUserTrackingAction(const G4Track* trk)
     fAnaM->fEvent.start_xyz[n][1] = trk->GetVertexPosition().getY()/CLHEP::cm;
     fAnaM->fEvent.start_xyz[n][2] = trk->GetVertexPosition().getZ()/CLHEP::cm;
 
-    fAnaM->fEvent.process->push_back(trk->GetCreatorProcess()->GetProcessName());
+    //std::cout<<"Neutron process vector size: "<<fAnaM->fEvent.process->size()<<std::endl;
+    std::string process_name = "primary";
+    if (trk->GetParentID() != 0)
+	process_name = trk->GetCreatorProcess()->GetProcessName();
+    fAnaM->fEvent.process->push_back(process_name);
     fAnaM->fEvent.trackId[n] = trk->GetTrackID();
     fAnaM->fEvent.parentId[n] = trk->GetParentID();
 
