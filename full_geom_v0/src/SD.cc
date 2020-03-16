@@ -86,7 +86,9 @@ G4bool SD::ProcessHits(G4Step* aStep,
   newHit->SetTrackID  (aStep->GetTrack()->GetTrackID());
   newHit->SetEdep(edep);
   newHit->SetPos (aStep->GetPostStepPoint()->GetPosition());
-  newHit->SetTime (aStep->GetPostStepPoint()->GetLocalTime());
+  newHit->SetTime (aStep->GetPostStepPoint()->GetGlobalTime());
+  // G4StepPoint::fGlobalTime: Time since event is created
+  // G4StepPoint::fLocalTime: Time since track is created
 
   newHit->SetIsElmag ( pdg == 22 || pdg == 11 || pdg == -11);
 
