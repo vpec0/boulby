@@ -119,6 +119,8 @@ G4bool SD::ProcessHits(G4Step* aStep,
 
 void SD::EndOfEvent(G4HCofThisEvent*)
 {
+    const G4double gateWindow = 0.1*CLHEP::us; // how to group hits, in microseconds
+
   if ( verboseLevel>1 ) {
      G4int nofHits = fHitsCollection->entries();
      G4cout << G4endl
@@ -146,9 +148,9 @@ void SD::EndOfEvent(G4HCofThisEvent*)
 	  if (gate > 0. && (total_em > 0. || total_non_em > 0.)) {
 	      em_deps.push_back(total_em  / CLHEP::MeV);
 	      non_em_deps.push_back(total_non_em / CLHEP::MeV);
-	      times.push_back((gate - 1.) / CLHEP::us);
+	      times.push_back((gate - gateWindow) / CLHEP::us);
 	  }
-	  gate = time+1.; // set signal gate to 1 us
+	  gate = time+gateWindow;
 	  total_em = 0.;
 	  total_non_em = 0.;
       }
@@ -161,7 +163,7 @@ void SD::EndOfEvent(G4HCofThisEvent*)
   if (total_em > 0. || total_non_em > 0.) {
       em_deps.push_back(total_em / CLHEP::MeV);
       non_em_deps.push_back(total_non_em / CLHEP::MeV);
-      times.push_back((gate - 1.) / CLHEP::us);
+      times.push_back((gate - gateWindow) / CLHEP::us);
   }
 
   //     std::cout<<" Energy deposited in detector "<<fDetector<<std::endl
