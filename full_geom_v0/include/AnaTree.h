@@ -72,7 +72,7 @@ namespace AnaTree {
 
 #define INT(var) Int_t var
 #define DOUBLE(var) Double_t var
-#define STRING_ARR(var) std::vector<std::string>* var
+#define STRING_ARR(var) std::vector<std::string>* var = 0
 #define INT_ARR(var, size) Int_t var[MAX_NEUTRONS]
 #define DOUBLE_ARR(var, size) Double_t var[MAX_NEUTRONS]
 #define DOUBLE_ARR2(var, size1, size2) Double_t var[MAX_NEUTRONS][size2]
