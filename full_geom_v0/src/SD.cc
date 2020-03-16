@@ -94,13 +94,13 @@ void SD::EndOfEvent(G4HCofThisEvent*)
   G4double edep = 0.;
   // process hit collections and pass data to ana manager
   for (auto hit: *(fHitsCollection->GetVector())) {
-      time = hit->GetTime()/CLHEP::us;
-      edep = hit->GetEdep() / CLHEP::MeV;
+      time = hit->GetTime();
+      edep = hit->GetEdep();
       if (time > gate) {
 	  if (gate > 0. && (total_em > 0. || total_non_em > 0.)) {
-	      em_deps.push_back(total_em);
-	      non_em_deps.push_back(total_non_em);
-	      times.push_back(gate - 1.);
+	      em_deps.push_back(total_em  / CLHEP::MeV);
+	      non_em_deps.push_back(total_non_em / CLHEP::MeV);
+	      times.push_back((gate - 1.) / CLHEP::us);
 	  }
 	  gate = time+1.; // set signal gate to 1 us
 	  total_em = 0.;
@@ -113,9 +113,9 @@ void SD::EndOfEvent(G4HCofThisEvent*)
   }
   // fill in last recorded hits
   if (total_em > 0. || total_non_em > 0.) {
-      em_deps.push_back(total_em);
-      non_em_deps.push_back(total_non_em);
-      times.push_back(gate - 1.);
+      em_deps.push_back(total_em / CLHEP::MeV);
+      non_em_deps.push_back(total_non_em / CLHEP::MeV);
+      times.push_back((gate - 1.) / CLHEP::us);
   }
 
   //     std::cout<<" Energy deposited in detector "<<fDetector<<std::endl
