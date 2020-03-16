@@ -49,6 +49,35 @@ G4bool SD::ProcessHits(G4Step* aStep,
 {
   // energy deposit
   G4double edep = aStep->GetTotalEnergyDeposit();
+  int pdg = aStep->GetTrack()->GetParticleDefinition()->GetPDGEncoding();
+
+  // if (pdg == 2112) {
+  //     // sum energy of secondaries
+  //     auto secondaries = aStep->GetSecondaryInCurrentStep();
+  //     G4double totalKine = 0.;
+  //     for (auto trk: *secondaries){
+  // 	  totalKine += trk->GetKineticEnergy();
+  //     }
+  //     G4int secpdg = secondaries->at(0)->GetParticleDefinition()->GetPDGEncoding();
+
+  //     G4double nonionidep = aStep->GetNonIonizingEnergyDeposit();
+  //     G4double startE = aStep->GetPreStepPoint()->GetTotalEnergy();
+  //     G4double endE = aStep->GetPostStepPoint()->GetTotalEnergy();
+  //     std::cout<<pdg<<" hit at ("
+  // 	       <<aStep->GetPostStepPoint()->GetPosition().x()<<","
+  // 	       <<aStep->GetPostStepPoint()->GetPosition().y()<<","
+  // 	       <<aStep->GetPostStepPoint()->GetPosition().z()<<")"
+  // 	       <<", startE = "<<startE
+  // 	       <<", endE = "<<endE
+  // 	       <<", Edep = "<<edep
+  // 	       <<", EdepNonIon = "<<nonionidep
+  // 	       <<", N secondaries = "<<aStep->GetNumberOfSecondariesInCurrentStep()
+  // 	       <<", 1st secondary pdg = "<<secpdg
+  // 	       <<", DE = "<<(startE-endE)
+  // 	       <<", Total KinE = "<<totalKine
+  // 	       <<std::endl;
+  // }
+
 
   if (edep==0.) return false;
 
@@ -59,11 +88,26 @@ G4bool SD::ProcessHits(G4Step* aStep,
   newHit->SetPos (aStep->GetPostStepPoint()->GetPosition());
   newHit->SetTime (aStep->GetPostStepPoint()->GetLocalTime());
 
-  int pdg = aStep->GetTrack()->GetParticleDefinition()->GetPDGEncoding();
   newHit->SetIsElmag ( pdg == 22 || pdg == 11 || pdg == -11);
 
   fHitsCollection->insert( newHit );
 
+  // G4double nonionidep = aStep->GetNonIonizingEnergyDeposit();
+  // std::cout<<pdg<<" hit at ("
+  // 	   <<aStep->GetPostStepPoint()->GetPosition().x()<<","
+  // 	   <<aStep->GetPostStepPoint()->GetPosition().y()<<","
+  // 	   <<aStep->GetPostStepPoint()->GetPosition().z()<<")"
+  // 	   <<", Edep = "<<edep
+  // 	   <<", EdepNonIon = "<<nonionidep
+  // 	   <<std::endl;
+
+  // if (pdg == 2112) {
+  //     std::cout<<"neutron hit at ("
+  // 	       <<aStep->GetPostStepPoint()->GetPosition().x()<<","
+  // 	       <<aStep->GetPostStepPoint()->GetPosition().y()<<","
+  // 	       <<aStep->GetPostStepPoint()->GetPosition().z()<<")"
+  // 	       <<", Edep = "<<edep<<std::endl;
+  // }
   //newHit->Print();
 
   return true;
