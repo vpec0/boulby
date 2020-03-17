@@ -1,5 +1,3 @@
-# Macro file for example B1
-#
 # Can be run in batch, without graphic
 # or interactively: Idle> /control/execute run1.mac
 #
@@ -15,17 +13,5 @@
 /event/verbose 0
 /tracking/verbose 0
 #
-# gamma 6 MeV to the direction (0.,0.,1.)
-#
-#/gun/particle gamma
-#/gun/energy 6 MeV
 #
 /run/beamOn 10
-#
-# proton 210 MeV to the direction (0.,0.,1.)
-#
-#/gun/particle proton
-#/gun/energy 210 MeV
-#/tracking/verbose 2
-#
-#/run/beamOn 1
