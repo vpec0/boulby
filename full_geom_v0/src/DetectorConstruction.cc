@@ -361,6 +361,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     // LXe Skin
     //
     G4Material* skin_mat = nist->FindOrBuildMaterial(material_map.at(SKIN_MATERIAL));
+    //std::cout<<skin_mat<<std::endl;
     G4Tubs* solidSkin =
 	new G4Tubs("Skin",
 		   0., 0.5*SKIN_D - ENV_SPACING, 0.5*SKIN_H - ENV_SPACING, 0., 360.*deg );
