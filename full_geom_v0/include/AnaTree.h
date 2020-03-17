@@ -6,6 +6,8 @@
 
 #include "TTree.h"
 
+#include "Constants.hh"
+
 namespace AnaTree {
 
     const int	MAX_NEUTRONS  = 4096;	// just hoping this will never be exceeded
@@ -14,6 +16,7 @@ namespace AnaTree {
     struct	Event_t;
     TTree*	createTree(const char* tree_name, Event_t& event);
     void	resetEvent(Event_t&);
+
 
 #define GEN_LIST				\
     DOUBLE(mu_en);				\
@@ -54,17 +57,11 @@ namespace AnaTree {
     DOUBLE_ARR(Tdep_gdls, n_gdls);		\
     DOUBLE_ARR(Tdep_wt, n_wt);			\
     					     	\
-    DOUBLE_ARR(Edep_tpc_em, n_tpc);		\
-    DOUBLE_ARR(Edep_rfr_em, n_rfr);		\
-    DOUBLE_ARR(Edep_skin_em, n_skin);		\
-    DOUBLE_ARR(Edep_gdls_em, n_gdls);		\
-    DOUBLE_ARR(Edep_wt_em, n_wt);		\
-    						\
-    DOUBLE_ARR(Edep_tpc_nonem, n_tpc);		\
-    DOUBLE_ARR(Edep_rfr_nonem, n_rfr);		\
-    DOUBLE_ARR(Edep_skin_nonem, n_skin);	\
-    DOUBLE_ARR(Edep_gdls_nonem, n_gdls);	\
-    DOUBLE_ARR(Edep_wt_nonem, n_wt)		\
+    DOUBLE_ARR2(Edep_tpc, n_tpc, kNDepositionClasses);		\
+    DOUBLE_ARR2(Edep_rfr, n_rfr, kNDepositionClasses);		\
+    DOUBLE_ARR2(Edep_skin, n_skin, kNDepositionClasses);	\
+    DOUBLE_ARR2(Edep_gdls, n_gdls, kNDepositionClasses);	\
+    DOUBLE_ARR2(Edep_wt, n_wt, kNDepositionClasses)		\
 
 
 
@@ -83,7 +80,9 @@ namespace AnaTree {
 	NEUTRON_LIST;
 
 #undef DOUBLE_ARR
+#undef DOUBLE_ARR2
 #define DOUBLE_ARR(var, size) Double_t var[MAX_DEPOSITIONS]
+#define DOUBLE_ARR2(var, size1, size2) Double_t var[MAX_DEPOSITIONS][size2]
 
 	DEPOSITS_LIST;
     };
@@ -113,6 +112,8 @@ namespace AnaTree {
 
 	NEUTRON_LIST;
 
+#undef DOUBLE_ARR2
+#define DOUBLE_ARR2(var, size1, size2) tree->Branch(#var, event.var, Form(#var"["#size1"][%d]/D", size2))
 	DEPOSITS_LIST;
 
 	return tree;

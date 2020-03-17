@@ -157,23 +157,22 @@ void AnaManager::Reset()
 
 /// Setters and getters
 
-void AnaManager::SetEdep(Double_t time, Double_t Edep_em, Double_t Edep_nonem, Int_t detector)
+void AnaManager::SetEdep(Double_t time, Double_t Edep0, Double_t Edep1,
+			 Double_t Edep2, Double_t Edep3, Int_t detector)
 {
     Int_t& n = *(&fEvent.n_tpc + detector);
 
     Double_t* times = fEvent.Tdep_tpc
-	+ detector*AnaTree::MAX_DEPOSITIONS;
-    times[n] = time;
+	+ detector*AnaTree::MAX_DEPOSITIONS + n;
+    (*times) = time;
 
-    Double_t* Edeps = fEvent.Edep_tpc_em
-	+ detector*AnaTree::MAX_DEPOSITIONS;
-    Edeps[n] = Edep_em;
+    Double_t* Edeps = (Double_t*)fEvent.Edep_tpc
+	+ detector*AnaTree::MAX_DEPOSITIONS*kNDepositionClasses + n;
+    Edeps[0] = Edep0;
+    Edeps[1] = Edep1;
+    Edeps[2] = Edep2;
+    Edeps[3] = Edep3;
     // std::cout<<"Added Edep_em "<<Edeps[n]<<" at position"<<n<<std::endl;
-
-    Edeps = fEvent.Edep_tpc_nonem
-	+ detector*AnaTree::MAX_DEPOSITIONS;
-    Edeps[n] = Edep_nonem;
-    // std::cout<<"Added Edep_nonem "<<Edeps[n]<<" at position"<<n<<std::endl;
 
     ++n;
 

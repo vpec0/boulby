@@ -25,11 +25,6 @@ class AnaManager
 {
 public:
     enum {
-	kEm=0,
-	kNonEm
-    };
-
-    enum {
 	kTpc=0,
 	kRfr,
 	kSkin,
@@ -59,7 +54,7 @@ public:
 
     // setters and getters
     // set or get energy deposit by EM or NonEM, and by detector
-    void SetEdep(Double_t, Double_t, Double_t, Int_t);
+    void SetEdep(Double_t, Double_t, Double_t, Double_t, Double_t, Int_t);
     //Double_t* GetEdep(Int_t, Int_t);
     void FillPDGEdep(Int_t detector, Int_t pdg, Double_t Edep) {
 	fHisto[detector]->Fill(Form("%d", pdg), Edep); }

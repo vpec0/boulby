@@ -89,8 +89,7 @@ G4bool SD::ProcessHits(G4Step* aStep,
   newHit->SetTime (aStep->GetPostStepPoint()->GetGlobalTime());
   // G4StepPoint::fGlobalTime: Time since event is created
   // G4StepPoint::fLocalTime: Time since track is created
-
-  newHit->SetIsElmag ( pdg == 22 || pdg == 11 || pdg == -11);
+  newHit->SetPdg( pdg );
 
   fHitsCollection->insert( newHit );
 
@@ -124,56 +123,82 @@ void SD::EndOfEvent(G4HCofThisEvent*)
 {
     const G4double gateWindow = 0.1*CLHEP::us; // how to group hits, in microseconds
 
-  if ( verboseLevel>1 ) {
-     G4int nofHits = fHitsCollection->entries();
-     G4cout << G4endl
-            << "-------->Hits Collection: in this event they are " << nofHits
-            << " hits in the tracker chambers: " << G4endl;
-     for ( G4int i=0; i<nofHits; i++ ) (*fHitsCollection)[i]->Print();
-  }
+    if ( verboseLevel>1 ) {
+	G4int nofHits = fHitsCollection->entries();
+	G4cout << G4endl
+	       << "-------->Hits Collection: in this event they are " << nofHits
+	       << " hits in the tracker chambers: " << G4endl;
+	for ( G4int i=0; i<nofHits; i++ ) (*fHitsCollection)[i]->Print();
+    }
 
-  std::vector<G4double> em_deps;
-  std::vector<G4double> non_em_deps;
+    std::vector<G4double> edeps[kNDepositionClasses];
 
-  std::vector<G4double> times;
+    std::vector<G4double> times;
 
-  G4double total_em = 0.;
-  G4double total_non_em = 0.;
+    G4double total[kNDepositionClasses] = {};
 
-  G4double gate = 0.;
-  G4double time = 0.;
-  G4double edep = 0.;
-  // process hit collections and pass data to ana manager
-  for (auto hit: *(fHitsCollection->GetVector())) {
-      time = hit->GetTime();
-      edep = hit->GetEdep();
-      if (time > gate) {
-	  if (gate > 0. && (total_em > 0. || total_non_em > 0.)) {
-	      em_deps.push_back(total_em  / CLHEP::MeV);
-	      non_em_deps.push_back(total_non_em / CLHEP::MeV);
-	      times.push_back((gate - gateWindow) / CLHEP::us);
-	  }
-	  gate = time+gateWindow;
-	  total_em = 0.;
-	  total_non_em = 0.;
-      }
-      if (hit->IsElmag())
-	  total_em += edep;
-      else
-	  total_non_em += edep;
-  }
-  // fill in last recorded hits
-  if (total_em > 0. || total_non_em > 0.) {
-      em_deps.push_back(total_em / CLHEP::MeV);
-      non_em_deps.push_back(total_non_em / CLHEP::MeV);
-      times.push_back((gate - gateWindow) / CLHEP::us);
-  }
+    G4double	gate = 0.;
+    G4double	time = 0.;
+    G4double	edep = 0.;
+    G4int	pdg  = 0;
+    EDepositionClass depcls;
+    // process hit collections and pass data to ana manager
+    for (auto hit: *(fHitsCollection->GetVector())) {
+	time = hit->GetTime();
+	edep = hit->GetEdep();
+	pdg = hit->GetPdg();
+	if (time > gate) {
+	    if ( gate > 0. && (total[0] > 0. || total[1] > 0. ||
+			       total[2] > 0. || total[3] > 0.) ) {
+		edeps[0].push_back(total[0]  / CLHEP::MeV);
+		edeps[1].push_back(total[1]  / CLHEP::MeV);
+		edeps[2].push_back(total[2]  / CLHEP::MeV);
+		edeps[3].push_back(total[3]  / CLHEP::MeV);
+		times.push_back((gate - gateWindow) / CLHEP::us);
+	    }
+	    gate = time+gateWindow;
+	    memset(total, 0, sizeof(total)) ;
+	}
+	if (edep == 0.) continue;
+	if (pdg == 22 || pdg == 11 || pdg == -1)
+	    depcls = kEm;
+	else if (pdg == -13 || pdg == 13)
+	    depcls = kMu;
+	else if (pdg > 1000540000 && pdg < 1000550000)
+	    depcls = kXe;
+	else
+	    depcls = kOther;
+	total[depcls] += edep;
 
-  //     std::cout<<" Energy deposited in detector "<<fDetector<<std::endl
-  // 	       <<"  EM: "<<total_em<<std::endl
-  // 	       <<"  nonEM: "<<total_non_em<<std::endl;
-  for (int i = 0; i < times.size(); ++i)
-      fAnaM->SetEdep(times[i], em_deps[i], non_em_deps[i], fDetector);
+	if (pdg == 13 || pdg == -13 || depcls == kMu)
+	    G4cout<<pdg<<", "<<time<<", "<<edep<<", "<<total[kMu]<<", "<<edeps[kMu].size()<<G4endl;
+    }
+
+
+    // fill in last recorded hits
+    if (total[0] > 0. || total[1] > 0. ||
+	total[2] > 0. || total[3] > 0.) {
+
+	edeps[0].push_back(total[0]  / CLHEP::MeV);
+	edeps[1].push_back(total[1]  / CLHEP::MeV);
+	edeps[2].push_back(total[2]  / CLHEP::MeV);
+	edeps[3].push_back(total[3]  / CLHEP::MeV);
+	times.push_back((gate - gateWindow) / CLHEP::us);
+    }
+
+    G4cout<<"End of event in det "<<fDetector<<", ";
+    if (edeps[0].size()) {
+	for (int i = 0; i < kNDepositionClasses; i++)
+	    G4cout<<edeps[i].at(0)<<", ";
+    } else
+	G4cout<<"no depositions"<<G4endl;
+    G4cout<<G4endl;
+
+    //     std::cout<<" Energy deposited in detector "<<fDetector<<std::endl
+    // 	       <<"  EM: "<<total_em<<std::endl
+    // 	       <<"  nonEM: "<<total_non_em<<std::endl;
+    for (int i = 0; i < times.size(); ++i)
+	fAnaM->SetEdep(times[i], edeps[0][i], edeps[1][i], edeps[2][i], edeps[3][i], fDetector);
 
 }
 

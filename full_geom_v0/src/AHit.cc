@@ -17,7 +17,7 @@ AHit::AHit()
    fEdep(0.),
    fPos(G4ThreeVector()),
    fTime(0.),
-   fIsElmag(0)
+   fPdg(0)
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -29,22 +29,22 @@ AHit::~AHit() {}
 AHit::AHit(const AHit& right)
   : G4VHit()
 {
-  fTrackID   = right.fTrackID;
-  fEdep      = right.fEdep;
-  fPos       = right.fPos;
-  fTime      = right.fTime;
-  fIsElmag   = right.fIsElmag;
+  fTrackID = right.fTrackID;
+  fEdep    = right.fEdep;
+  fPos     = right.fPos;
+  fTime    = right.fTime;
+  fPdg	   = right.fPdg;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 const AHit& AHit::operator=(const AHit& right)
 {
-  fTrackID   = right.fTrackID;
-  fEdep      = right.fEdep;
-  fPos       = right.fPos;
-  fTime      = right.fTime;
-  fIsElmag   = right.fIsElmag;
+  fTrackID = right.fTrackID;
+  fEdep    = right.fEdep;
+  fPos     = right.fPos;
+  fTime    = right.fTime;
+  fPdg	   = right.fPdg;
 
   return *this;
 }
