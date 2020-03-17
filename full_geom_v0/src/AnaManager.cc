@@ -177,7 +177,7 @@ void AnaManager::SetEdep(Double_t time, Double_t Edep0, Double_t Edep1,
     (*times) = time;
 
     Double_t* Edeps = (Double_t*)fEvent.Edep_tpc
-	+ detector*AnaTree::MAX_DEPOSITIONS*kNDepositionClasses + n;
+	+ detector*AnaTree::MAX_DEPOSITIONS*kNDepositionClasses + n*kNDepositionClasses;
     Edeps[0] = Edep0;
     Edeps[1] = Edep1;
     Edeps[2] = Edep2;
