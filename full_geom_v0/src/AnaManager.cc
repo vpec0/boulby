@@ -124,6 +124,16 @@ void AnaManager::FillTree()
 {
     // do any event filtering here
     fTree->Fill();
+
+    // G4cout<<"AnaManager: filling tree"<<G4endl
+    // 	  <<" Edeposits: "<<G4endl
+    // 	  <<"  TPC: "<<G4endl;
+    // for (int i = 0; i < fEvent.n_tpc; ++i) {
+    // 	G4cout<<"    "<<fEvent.Tdep_tpc[i]<<": ";
+    // 	for (int j = 0; j < kNDepositionClasses; ++j)
+    // 	    G4cout<<fEvent.Edep_tpc[i][j]<<" ";
+    // 	G4cout<<G4endl;
+    // }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -175,6 +185,12 @@ void AnaManager::SetEdep(Double_t time, Double_t Edep0, Double_t Edep1,
     // std::cout<<"Added Edep_em "<<Edeps[n]<<" at position"<<n<<std::endl;
 
     ++n;
+
+    // G4cout<<"AnaManager: inserting Edep to detector "<<detector<<": "
+    // 	  <<time<<": ";
+    // for (int i = 0; i < kNDepositionClasses; i++)
+    // 	G4cout<<Edeps[i]<<", ";
+    // G4cout<<G4endl;
 
     // std::cout<<"Event "<<fEvent.eventNo<<std::endl;
     // std::cout<<"TPC N: "<<fEvent.n_tpc<<", EM E: "<<fEvent.Edep_tpc_em[fEvent.n_tpc-1]

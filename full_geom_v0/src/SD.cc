@@ -169,9 +169,6 @@ void SD::EndOfEvent(G4HCofThisEvent*)
 	else
 	    depcls = kOther;
 	total[depcls] += edep;
-
-	if (pdg == 13 || pdg == -13 || depcls == kMu)
-	    G4cout<<pdg<<", "<<time<<", "<<edep<<", "<<total[kMu]<<", "<<edeps[kMu].size()<<G4endl;
     }
 
 
@@ -186,13 +183,13 @@ void SD::EndOfEvent(G4HCofThisEvent*)
 	times.push_back((gate - gateWindow) / CLHEP::us);
     }
 
-    G4cout<<"End of event in det "<<fDetector<<", ";
-    if (edeps[0].size()) {
-	for (int i = 0; i < kNDepositionClasses; i++)
-	    G4cout<<edeps[i].at(0)<<", ";
-    } else
-	G4cout<<"no depositions"<<G4endl;
-    G4cout<<G4endl;
+    // G4cout<<"End of event in det "<<fDetector<<", ";
+    // if (edeps[0].size()) {
+    // 	for (int i = 0; i < kNDepositionClasses; i++)
+    // 	    G4cout<<edeps[i].at(0)<<", ";
+    // } else
+    // 	G4cout<<"no depositions"<<G4endl;
+    // G4cout<<G4endl;
 
     //     std::cout<<" Energy deposited in detector "<<fDetector<<std::endl
     // 	       <<"  EM: "<<total_em<<std::endl
