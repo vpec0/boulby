@@ -112,9 +112,10 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
 
     G4int eventNo = anEvent->GetEventID();
+    static const G4int size = fMuons.size();
 
 
-    if (!fMuonFile) {
+    if (!size) {
 	G4ThreeVector pos(0.,0.,0.);
 
 	fParticleGun->
@@ -131,7 +132,6 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
     Muon_t muon;
 
-    G4int size = fMuons.size();
     G4int entry = eventNo % size;
 
     muon = fMuons[entry];
