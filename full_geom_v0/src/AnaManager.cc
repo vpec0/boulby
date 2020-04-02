@@ -67,8 +67,8 @@ void AnaManager::Book()
 
   // create 1st ntuple
   fTree = AnaTree::createTree("events", fEvent);
-  // have the tree saved every 20kB
-  fTree->SetAutoSave(-20000);
+  // have the tree saved every 1MB
+  fTree->SetAutoSave(-1000000);
 
 
   // create a histogram to save pdg of particles which deposit energy

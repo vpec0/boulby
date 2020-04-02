@@ -194,9 +194,10 @@ void SD::EndOfEvent(G4HCofThisEvent*)
     //     std::cout<<" Energy deposited in detector "<<fDetector<<std::endl
     // 	       <<"  EM: "<<total_em<<std::endl
     // 	       <<"  nonEM: "<<total_non_em<<std::endl;
-    for (int i = 0; i < times.size(); ++i)
+    for (int i = 0; i < times.size(); ++i) {
+	if (i == AnaTree::MAX_DEPOSITIONS) break;
 	fAnaM->SetEdep(times[i], edeps[0][i], edeps[1][i], edeps[2][i], edeps[3][i], fDetector);
-
+    }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
