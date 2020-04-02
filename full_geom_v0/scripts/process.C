@@ -1,7 +1,6 @@
 #define ANATREE_CXX
 #include "AnaTree.h"
 
-
 #define FOR(i, size) for (unsigned int i = 0; i < size; ++i)
 typedef const char* STR;
 
@@ -24,25 +23,20 @@ void process(STR fname, STR outpref, STR charge = "default", STR material = "def
 
     // allow only a subset of branches
     std::vector<TString> allowed = {
-	"n_tpc",
-	"n_rfr",
-	"n_skin",
-	"n_gdls",
-	"n_wt",
-	"Edep_tpc_em",
-	"Edep_rfr_em",
-	"Edep_skin_em",
-	"Edep_gdls_em",
-	"Edep_wt_em",
-	"Edep_tpc_nonem",
-	"Edep_rfr_nonem",
-	"Edep_skin_nonem",
-	"Edep_gdls_nonem",
-	"Edep_wt_nonem"
+    	"n_tpc",
+    	"n_rfr",
+    	"n_skin",
+    	"n_gdls",
+    	"n_wt",
+    	"Edep_tpc",
+    	"Edep_rfr",
+    	"Edep_skin",
+    	"Edep_gdls",
+    	"Edep_wt"
     };
     tree->SetBranchStatus("*", 0);
     for (auto allow: allowed)
-	tree->SetBranchStatus(allow, 1);
+    	tree->SetBranchStatus(allow, 1);
 
 
 
@@ -89,12 +83,6 @@ void process(STR fname, STR outpref, STR charge = "default", STR material = "def
 
     // output file
     auto outf = TFile::Open(Form("%shists.root", outpref), "UPDATE");
-    // if (!outf->cd(material))
-    // 	outf->mkdir(material)->cd();
-    // if (!gDirectory->cd(energy))
-    // 	gDirectory->mkdir(energy)->cd();
-    // if (!gDirectory->cd("neutrons_info"))
-    // 	gDirectory->mkdir("neutrons_info")->cd();
 
     // main loop
     unsigned int size = tree->GetEntries();
@@ -116,17 +104,17 @@ void process(STR fname, STR outpref, STR charge = "default", STR material = "def
 	tree->GetEntry(ientry);
 
 	double etot[EDepNhists] = {};
-	for (int i = 0; i < EDepNhists; ++i) {
+	for (int i = 0; i < AnaTree::Ndetectors; ++i) {
 	    int& n = *(&evt->n_tpc + i);
-	    double* edep_em = evt->Edep_tpc_em + i*AnaTree::MAX_DEPOSITIONS;
-	    double* edep_nonem = evt->Edep_tpc_nonem + i*AnaTree::MAX_DEPOSITIONS;
+	    double* edep = (double*)evt->Edep_tpc + i*AnaTree::MAX_DEPOSITIONS*kNDepositionClasses;
 
-	    // cout<<"i = "<<i
-	    // 	<<", n = "<<n<<endl;
-	    for (int j = 0; j < n; ++j) {
-		etot[i] += edep_em[j] + edep_nonem[j];
+	    for ( int j = 0; j < n; ++j ) {
+		for ( int k = 0; k < kNDepositionClasses; ++k ) {
+		    etot[i] += *(edep + j*kNDepositionClasses + k);
+		}
 	    }
-	    if(etot[i] > 0.)
+
+ 	    if(etot[i] > 0.)
 		edephists[i]->Fill(etot[i]);
 	}
 
@@ -147,6 +135,7 @@ void process(STR fname, STR outpref, STR charge = "default", STR material = "def
 	h->Write(h->GetName(), TObject::kOverwrite);
     }
 
+    cout<<"Saving histograms in "<<outf->GetName()<<endl;
     outf->Close();
 }
 

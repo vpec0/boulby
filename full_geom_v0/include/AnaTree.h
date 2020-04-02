@@ -13,6 +13,8 @@ namespace AnaTree {
     const int	MAX_NEUTRONS  = 4096;	// just hoping this will never be exceeded
     const int MAX_DEPOSITIONS = 56;	// maximum energy deposits, bunched in 1 us, to be stored
 
+    const int Ndetectors = 5;
+
     struct	Event_t;
     TTree*	createTree(const char* tree_name, Event_t& event);
     void	resetEvent(Event_t&);
