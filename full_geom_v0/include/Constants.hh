@@ -10,7 +10,7 @@ enum EDepositionClass {
 };
 
 
-const char* DepositionClassNames[] = {
+static const char* DepositionClassNames[] = {
     "Xe",
     "Em",
     "Mu",
