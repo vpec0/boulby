@@ -294,7 +294,8 @@ namespace Geometry {
 	{"GXe", "G4_Xe"},
 	{"Titanium", "G4_Ti"},
 	{"Air", "G4_AIR"},
-	{"Rock", "StdRock"},
+	// {"Rock", "StdRock"},
+	{"Rock", "NaCl"},
 	{"Water", "G4_WATER"},
 	{"GdLS", "GdLS"},
 	{"Steel", "G4_STAINLESS-STEEL"}

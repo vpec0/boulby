@@ -578,6 +578,10 @@ void DetectorConstruction::PrepareMaterials(G4NistManager* nist)
     StdRock->AddElement(nist->FindOrBuildElement("C"),  12.*perCent);
     StdRock->AddElement(nist->FindOrBuildElement("Mg"),  9.*perCent);
 
+    auto NaCl = new G4Material("NaCl",2.17*g/cm3, 2, kStateSolid );
+    NaCl->AddElement(nist->FindOrBuildElement("Na"), 1);
+    NaCl->AddElement(nist->FindOrBuildElement("Cl"), 1);
+
 
     // define GdLS
     // FIXME: inspired by Daya Bay, the fractions may not be correct, need to find a proper definition
