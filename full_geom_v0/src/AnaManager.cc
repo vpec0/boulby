@@ -161,6 +161,7 @@ void AnaManager::PrintStatistic()
 void AnaManager::Reset()
 {
     AnaTree::resetEvent(fEvent);
+    fWarningMessageCount = 0; // allow warning message to be printed in each event by reseting the counter
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
