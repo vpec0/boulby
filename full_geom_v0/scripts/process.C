@@ -29,7 +29,12 @@ void process(STR fname, STR outpref, int batchNo = 4, int Nruns = 10)
     	"Edep_rfr",
     	"Edep_skin",
     	"Edep_gdls",
-    	"Edep_wt"
+    	"Edep_wt",
+    	"Tdep_tpc",
+    	"Tdep_rfr",
+    	"Tdep_skin",
+    	"Tdep_gdls",
+    	"Tdep_wt"
     };
     tree->SetBranchStatus("*", 0);
     for (auto allow: allowed)
@@ -51,6 +56,7 @@ void process(STR fname, STR outpref, int batchNo = 4, int Nruns = 10)
 	EdepTpcNoSkin,
 	EdepTpcNoSkinGdls,
 	EdepTpcNoSkinGdlsWt,
+	EdepTpcNoSkinWt,
 	EdepTpcNoGdls,
 	EdepTpcNoGdlsWt,
 	EdepTpcNoWt,
@@ -59,42 +65,47 @@ void process(STR fname, STR outpref, int batchNo = 4, int Nruns = 10)
     };
     TH1* edephists[EDepNhists] = {};
 
-#define H1(name, title, nbins, low, high) edephists[name] = new TH1F(#name, title, nbins, low, high)
+#define H1(name, title) edephists[name] = new TH1F(#name, title, 400, 0.0001, 1e6); \
+    doXlog(edephists[name])						\
 
-    H1(EdepTpc, "Energy Deposited in TPC;Energy [MeV];[MeV^{-1}]", 360, 0.001, 1e6);
-    doXlog(edephists[EdepTpc]);
-    H1(EdepRfr, "Energy Deposited in RFR;Energy [MeV];[MeV^{-1}]", 360, 0.001, 1e6);
-    doXlog(edephists[EdepRfr]);
-    H1(EdepSkin, "Energy Deposited in Skin;Energy [MeV];[MeV^{-1}]", 360, 0.001, 1e6);
-    doXlog(edephists[EdepSkin]);
-    H1(EdepGdls, "Energy Deposited in GdLS;Energy [MeV];[MeV^{-1}]", 360, 0.001, 1e6);
-    doXlog(edephists[EdepGdls]);
-    H1(EdepWt, "Energy Deposited in WT;Energy [MeV];[MeV^{-1}]", 360, 0.001, 1e6);
-    doXlog(edephists[EdepWt]);
-
+    H1(EdepTpc, "Energy Deposited in TPC;Energy [MeV];[MeV^{-1}]");
+    H1(EdepRfr, "Energy Deposited in RFR;Energy [MeV];[MeV^{-1}]");
+    H1(EdepSkin, "Energy Deposited in Skin;Energy [MeV];[MeV^{-1}]");
+    H1(EdepGdls, "Energy Deposited in GdLS;Energy [MeV];[MeV^{-1}]");
+    H1(EdepWt, "Energy Deposited in WT;Energy [MeV];[MeV^{-1}]");
     H1(EdepTpcNoWt, "Energy Deposited in TPC, WT veto"
-       ";Energy [MeV];[MeV^{-1}]", 360, 0.001, 1e6);
-    doXlog(edephists[EdepTpcNoWt]);
-
+       ";Energy [MeV];[MeV^{-1}]");
     H1(EdepTpcNoGdls, "Energy Deposited in TPC, Scint veto"
-       ";Energy [MeV];[MeV^{-1}]", 360, 0.001, 1e6);
-    doXlog(edephists[EdepTpcNoGdls]);
-
+       ";Energy [MeV];[MeV^{-1}]");
     H1(EdepTpcNoGdlsWt, "Energy Deposited in TPC, Scint+WT veto"
-       ";Energy [MeV];[MeV^{-1}]", 360, 0.001, 1e6);
-    doXlog(edephists[EdepTpcNoGdlsWt]);
-
+       ";Energy [MeV];[MeV^{-1}]");
     H1(EdepTpcNoSkinGdls, "Energy Deposited in TPC, Skin+Scint veto"
-       ";Energy [MeV];[MeV^{-1}]", 360, 0.001, 1e6);
-    doXlog(edephists[EdepTpcNoSkinGdls]);
-
+       ";Energy [MeV];[MeV^{-1}]");
     H1(EdepTpcNoSkinGdlsWt, "Energy Deposited in TPC, Skin+Scint+WT veto"
-       ";Energy [MeV];[MeV^{-1}]", 360, 0.001, 1e6);
-    doXlog(edephists[EdepTpcNoSkinGdlsWt]);
-
+       ";Energy [MeV];[MeV^{-1}]");
+    H1(EdepTpcNoSkinWt, "Energy Deposited in TPC, Skin+WT veto"
+       ";Energy [MeV];[MeV^{-1}]");
     H1(EdepTpcNoSkin, "Energy Deposited in TPC, Skin veto"
-       ";Energy [MeV];[MeV^{-1}]", 360, 0.001, 1e6);
-    doXlog(edephists[EdepTpcNoSkin]);
+       ";Energy [MeV];[MeV^{-1}]");
+
+    // Xe only depositions in TPC
+    TH1* hists_tpc_xeonly[EDepNhists] = {};
+#undef H1
+#define H1(name, title) hists_tpc_xeonly[name] =			\
+	new TH1F(Form("%s_Xeonly", #name),				\
+		 Form("Energy Deposited by Xe only in TPC, %s;Energy [MeV];[MeV^{-1}]", \
+		      title),						\
+		 400, 0.0001, 1e6);					\
+    doXlog(hists_tpc_xeonly[name])					\
+
+    H1(EdepTpc, "");
+    H1(EdepTpcNoWt, "WT veto");
+    H1(EdepTpcNoGdls, "Scint veto");
+    H1(EdepTpcNoGdlsWt, "Scint+WT veto");
+    H1(EdepTpcNoSkinGdls, "Skin+Scint veto");
+    H1(EdepTpcNoSkinGdlsWt, "Skin+Scint+WT veto");
+    H1(EdepTpcNoSkinWt, "Skin+WT veto");
+    H1(EdepTpcNoSkin, "Skin veto");
 
 
     // histograms by deposition types
@@ -104,27 +115,22 @@ void process(STR fname, STR outpref, int batchNo = 4, int Nruns = 10)
 	new TH1F(Form("%s_%s", #name, DepositionClassNames[depclass]),	\
 		 Form("Energy Deposited by %s in TPC, %s;Energy [MeV];[MeV^{-1}]", \
 		      DepositionClassNames[depclass], title),		\
-		 360, 0.001, 1e6)					\
+		 400, 0.0001, 1e6);					\
+    doXlog(hists[name][depclass])					\
 
     FOR(i, kNDepositionClasses) {
+	H1(i, EdepTpc, "");
+	H1(i, EdepRfr, "");
+	H1(i, EdepSkin, "");
+	H1(i, EdepGdls, "");
+	H1(i, EdepWt, "");
 	H1(i, EdepTpcNoWt, "WT veto");
-	doXlog(hists[EdepTpcNoWt][i]);
-
 	H1(i, EdepTpcNoGdls, "Scint veto");
-	doXlog(hists[EdepTpcNoGdls][i]);
-
 	H1(i, EdepTpcNoGdlsWt, "Scint+WT veto");
-	doXlog(hists[EdepTpcNoGdlsWt][i]);
-
 	H1(i, EdepTpcNoSkinGdls, "Skin+Scint veto");
-	doXlog(hists[EdepTpcNoSkinGdls][i]);
-
 	H1(i, EdepTpcNoSkinGdlsWt, "Skin+Scint+WT veto");
-	doXlog(hists[EdepTpcNoSkinGdlsWt][i]);
-
+	H1(i, EdepTpcNoSkinWt, "Skin+WT veto");
 	H1(i, EdepTpcNoSkin, "Skin veto");
-	doXlog(hists[EdepTpcNoSkin][i]);
-
     }
 
 
@@ -180,6 +186,7 @@ void process(STR fname, STR outpref, int batchNo = 4, int Nruns = 10)
 
 	double	skin_veto = 0.1;	// 100 keV
 	double	gdls_veto = 0.2;	// 200 keV
+	//double	gdls_veto = 200.;	// 200 MeV
 	double	wt_veto	  = 200.;	// 200 MeV
 
 	if (etot[EdepTpc] > 0.) {
@@ -187,9 +194,13 @@ void process(STR fname, STR outpref, int batchNo = 4, int Nruns = 10)
 		edephists[EdepTpcNoSkin]->Fill(etot[EdepTpc]);
 		if (etot[EdepGdls] < gdls_veto) {
 		    edephists[EdepTpcNoSkinGdls]->Fill(etot[EdepTpc]);
+		    //cout<<"Filling EdepTpcNoSkinGdls: "<<etot[EdepTpc]<<endl;
 		    if (etot[EdepWt] < wt_veto) {
 			edephists[EdepTpcNoSkinGdlsWt]->Fill(etot[EdepTpc]);
 		    }
+		}
+		if (etot[EdepWt] < wt_veto) {
+		    edephists[EdepTpcNoSkinWt]->Fill(etot[EdepTpc]);
 		}
 	    }
 
@@ -205,7 +216,43 @@ void process(STR fname, STR outpref, int batchNo = 4, int Nruns = 10)
 	    }
 	}
 
+	// only Xe doposition in TPC
+	if (etot_class[EdepTpc][kEm]+etot_class[EdepTpc][kMu]+etot_class[EdepTpc][kOther] == 0.) {
+	    //no other depositions
+	    if (etot_class[EdepTpc][kXe] > 0.) {
+		hists_tpc_xeonly[EdepTpc]->Fill(etot_class[EdepTpc][kXe]);
+		if (etot[EdepSkin] < skin_veto) {
+		    hists_tpc_xeonly[EdepTpcNoSkin]->Fill(etot_class[EdepTpc][kXe]);
+		    if (etot[EdepGdls] < gdls_veto) {
+			hists_tpc_xeonly[EdepTpcNoSkinGdls]->Fill(etot_class[EdepTpc][kXe]);
+			if (etot[EdepWt] < wt_veto) {
+			    hists_tpc_xeonly[EdepTpcNoSkinGdlsWt]->Fill(etot_class[EdepTpc][kXe]);
+			}
+		    }
+		    if (etot[EdepWt] < wt_veto) {
+			hists_tpc_xeonly[EdepTpcNoSkinWt]->Fill(etot_class[EdepTpc][kXe]);
+		    }
+		}
+
+		if (etot[EdepGdls] < gdls_veto) {
+		    hists_tpc_xeonly[EdepTpcNoGdls]->Fill(etot_class[EdepTpc][kXe]);
+		    if (etot[EdepWt] < wt_veto) {
+			hists_tpc_xeonly[EdepTpcNoGdlsWt]->Fill(etot_class[EdepTpc][kXe]);
+		    }
+		}
+
+		if (etot[EdepWt] < wt_veto) {
+		    hists_tpc_xeonly[EdepTpcNoWt]->Fill(etot_class[EdepTpc][kXe]);
+		}
+	    }
+	}
+
 	FOR(i, kNDepositionClasses) {
+	    for (int j = 0; j < AnaTree::Ndetectors; ++j) {
+		if(etot_class[j][i] > 0.)
+		    hists[j][i]->Fill(etot_class[j][i]);
+	    }
+
 	    if (etot_class[EdepTpc][i] > 0.) {
 		if (etot[EdepSkin] < skin_veto) {
 		    hists[EdepTpcNoSkin][i]->Fill(etot_class[EdepTpc][i]);
@@ -214,6 +261,9 @@ void process(STR fname, STR outpref, int batchNo = 4, int Nruns = 10)
 			if (etot[EdepWt] < wt_veto) {
 			    hists[EdepTpcNoSkinGdlsWt][i]->Fill(etot_class[EdepTpc][i]);
 			}
+		    }
+		    if (etot[EdepWt] < wt_veto) {
+			hists[EdepTpcNoSkinWt][i]->Fill(etot_class[EdepTpc][i]);
 		    }
 		}
 
@@ -238,12 +288,21 @@ void process(STR fname, STR outpref, int batchNo = 4, int Nruns = 10)
 	h->Write(h->GetName(), TObject::kOverwrite);
     }
 
-    for (int i = EdepTpcNoSkin; i < EDepNhists; ++i) {
+    for (int i = 0; i < EDepNhists; ++i) {
 	FOR(j, kNDepositionClasses) {
 	    auto h = hists[i][j];
 	    h->Write(h->GetName(), TObject::kOverwrite);
 	}
     }
+
+    auto h = hists_tpc_xeonly[EdepTpc];
+    h->Write(h->GetName(), TObject::kOverwrite);
+    for (int i = EdepTpcNoSkin; i < EDepNhists; ++i) {
+	auto h = hists_tpc_xeonly[i];
+	h->Write(h->GetName(), TObject::kOverwrite);
+    }
+
+
 
     cout<<"Saving histograms in "<<outf->GetName()<<endl;
     outf->Close();
