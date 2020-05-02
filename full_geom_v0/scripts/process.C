@@ -6,16 +6,33 @@
 typedef const char* STR;
 
 void doXlog(TH1*, int which = 0);
-void attachFiles(TChain* tree, const char* fname, int batchNo, int Nruns);
 
-void process(STR fname, STR outpref, int batchNo = 4, int Nruns = 10)
+#include "common.icc"
+
+void process(STR fname, STR outpref, int batchNo = 4, int Nruns = 10,
+	     const char* LS = "LSon",
+	     const char* basedir = "data/full_geom_v0_4classes")
 {
+
     // input tree
     auto tree = new TChain("events");
-    attachFiles(tree, fname, batchNo, Nruns);
+    size_t size = attachFiles(tree, fname, batchNo, Nruns, basedir);
     auto evt = new AnaTree::Event_t;
     AnaTree::resetEvent(*evt);
     AnaTree::registerTree(tree, *evt);
+
+
+    const double	skin_veto = 0.1;	// 100 keV
+    double gdls_veto		  = 0.2;	// 200 keV, default LS treated as LS
+    const double	wt_veto	  = 200.;	// 200 MeV
+    if (strstr("LSoff", LS))
+	gdls_veto = wt_veto;	// 200 MeV, treat LS as WT
+
+    cout<<"Using following threshold for veto detectors:"<<endl
+	<<"  Skin: "<<skin_veto<<endl
+	<<"  GdLS: "<<gdls_veto<<endl
+	<<"    WT: "<<wt_veto<<endl;
+
 
 
     // allow only a subset of branches
@@ -65,7 +82,7 @@ void process(STR fname, STR outpref, int batchNo = 4, int Nruns = 10)
     };
     TH1* edephists[EDepNhists] = {};
 
-#define H1(name, title) edephists[name] = new TH1F(#name, title, 400, 0.0001, 1e6); \
+#define H1(name, title) edephists[name] = new TH1D(#name, title, 400, 0.0001, 1e6); \
     doXlog(edephists[name])						\
 
     H1(EdepTpc, "Energy Deposited in TPC;Energy [MeV];[MeV^{-1}]");
@@ -92,7 +109,7 @@ void process(STR fname, STR outpref, int batchNo = 4, int Nruns = 10)
     TH1* hists_tpc_xeonly[EDepNhists] = {};
 #undef H1
 #define H1(name, title) hists_tpc_xeonly[name] =			\
-	new TH1F(Form("%s_Xeonly", #name),				\
+	new TH1D(Form("%s_Xeonly", #name),				\
 		 Form("Energy Deposited by Xe only in TPC, %s;Energy [MeV];[MeV^{-1}]", \
 		      title),						\
 		 400, 0.0001, 1e6);					\
@@ -112,25 +129,25 @@ void process(STR fname, STR outpref, int batchNo = 4, int Nruns = 10)
     TH1* hists[EDepNhists][kNDepositionClasses] = {};
 #undef H1
 #define H1(depclass, name, title) hists[name][depclass] =		\
-	new TH1F(Form("%s_%s", #name, DepositionClassNames[depclass]),	\
-		 Form("Energy Deposited by %s in TPC, %s;Energy [MeV];[MeV^{-1}]", \
+	new TH1D(Form("%s_%s", #name, DepositionClassNames[depclass]),	\
+		 Form("Energy Deposited by %s in %s;Energy [MeV];[MeV^{-1}]", \
 		      DepositionClassNames[depclass], title),		\
 		 400, 0.0001, 1e6);					\
     doXlog(hists[name][depclass])					\
 
     FOR(i, kNDepositionClasses) {
-	H1(i, EdepTpc, "");
-	H1(i, EdepRfr, "");
-	H1(i, EdepSkin, "");
-	H1(i, EdepGdls, "");
-	H1(i, EdepWt, "");
-	H1(i, EdepTpcNoWt, "WT veto");
-	H1(i, EdepTpcNoGdls, "Scint veto");
-	H1(i, EdepTpcNoGdlsWt, "Scint+WT veto");
-	H1(i, EdepTpcNoSkinGdls, "Skin+Scint veto");
-	H1(i, EdepTpcNoSkinGdlsWt, "Skin+Scint+WT veto");
-	H1(i, EdepTpcNoSkinWt, "Skin+WT veto");
-	H1(i, EdepTpcNoSkin, "Skin veto");
+	H1(i, EdepTpc, "TPC");
+	H1(i, EdepRfr, "RFR");
+	H1(i, EdepSkin, "Skin");
+	H1(i, EdepGdls, "Scint");
+	H1(i, EdepWt, "WT");
+	H1(i, EdepTpcNoWt, "TPC, WT veto");
+	H1(i, EdepTpcNoGdls, "TPC, Scint veto");
+	H1(i, EdepTpcNoGdlsWt, "TPC, Scint+WT veto");
+	H1(i, EdepTpcNoSkinGdls, "TPC, Skin+Scint veto");
+	H1(i, EdepTpcNoSkinGdlsWt, "TPC, Skin+Scint+WT veto");
+	H1(i, EdepTpcNoSkinWt, "TPC, Skin+WT veto");
+	H1(i, EdepTpcNoSkin, "TPC, Skin veto");
     }
 
 
@@ -142,24 +159,24 @@ void process(STR fname, STR outpref, int batchNo = 4, int Nruns = 10)
     auto outf = TFile::Open(Form("%shists.root", outpref), "UPDATE");
 
     // main loop
-    unsigned int size = tree->GetEntries();
 
 #ifdef DEBUG
     size = 20; // just for debugging
 #endif
     //size = 1000000;
-    int step = size / 50;
+    size_t step = size / 50;
 
     cout << "Will process "<<size<<" entries."<<endl;
     cout<<"|                                                  |\r|";
     cout.flush();
     // loop over tree entries
-    FOR(ientry, size) {
+    size_t ientry = 0;
+    while ( tree->GetEntry(ientry) ) {
 	if (step && (ientry+1) % step == 0 ) {
 	    cout<<"-";
 	    cout.flush();
 	}
-	tree->GetEntry(ientry);
+
 
 	double etot[EDepNhists] = {};
 	double etot_class[EDepNhists][kNDepositionClasses] = {};
@@ -184,10 +201,6 @@ void process(STR fname, STR outpref, int batchNo = 4, int Nruns = 10)
 		edephists[i]->Fill(etot[i]);
 	}
 
-	double	skin_veto = 0.1;	// 100 keV
-	double	gdls_veto = 0.2;	// 200 keV
-	//double	gdls_veto = 200.;	// 200 MeV
-	double	wt_veto	  = 200.;	// 200 MeV
 
 	if (etot[EdepTpc] > 0.) {
 	    if (etot[EdepSkin] < skin_veto) {
@@ -279,7 +292,9 @@ void process(STR fname, STR outpref, int batchNo = 4, int Nruns = 10)
 		}
 	    }
 	}
-    }
+
+	++ientry;
+    } // tree while loop
     cout<<"|"<<endl;
 
     // write out output histograms into the output file
