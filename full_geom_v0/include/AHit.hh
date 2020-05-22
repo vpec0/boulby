@@ -70,6 +70,8 @@ inline void* AHit::operator new(size_t)
 
 inline void AHit::operator delete(void *hit)
 {
+  if(!AHitAllocator)
+      AHitAllocator = new G4Allocator<AHit>;
   AHitAllocator->FreeSingle((AHit*) hit);
 }
 
