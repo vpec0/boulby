@@ -50,6 +50,7 @@ class ActionInitialization : public G4VUserActionInitialization
     virtual void Build() const;
 
     void SetStartEvent(G4int evt) { fStartEvent = evt; }
+    void SetEventOffset(G4int evt) { fEventOffset = evt; }
     void SetNevents(G4int nevts) { fNevents = nevts; }
 
 private:
@@ -58,6 +59,7 @@ private:
     G4String mMuonFileName;
 
     G4int fStartEvent;
+    G4int fEventOffset;
     G4int fNevents;
 };
 

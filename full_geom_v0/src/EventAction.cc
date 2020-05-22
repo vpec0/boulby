@@ -27,9 +27,12 @@ EventAction::~EventAction()
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
+using namespace std;
 void EventAction::BeginOfEventAction(const G4Event* evt)
 {
+    // set EventId based on the input offset
+    // cannot do, getting const event!
+
 
     // Set current random number seeds based on the current run and event
     long seeds[200] = {};
@@ -39,6 +42,8 @@ void EventAction::BeginOfEventAction(const G4Event* evt)
     // std::cout<<"Original event seeds: "<<s[0]<<", "<<s[1]<<std::endl;
     unsigned runId = G4RunManager::GetRunManager()->GetCurrentRun()->GetRunID();
     unsigned evtId = evt->GetEventID();
+    // cout<<"Run: "<<runId<<endl
+    // 	<<"Event: "<<evtId<<endl;
     /// Temporary debugging vvvvvvvvvvvvvvvvvvvv
     // runId = 20000;
     // evtId = 7452;

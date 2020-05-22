@@ -68,7 +68,12 @@ void ActionInitialization::BuildForMaster() const
 
 void ActionInitialization::Build() const
 {
-    SetUserAction(new PrimaryGeneratorAction(mMuonFileName, fNevents, fStartEvent));
+    auto pga = new PrimaryGeneratorAction(mMuonFileName, fNevents, fStartEvent);
+    SetUserAction(pga);
+    if (fEventOffset)
+	pga->SetEventOffset(fEventOffset);
+    pga->ReadInMuonFile();
+
     //SetUserAction(new PrimaryGeneratorAction()); // generate single neutron in the centre of the TPC
 
   RunAction* runAction = new RunAction ();

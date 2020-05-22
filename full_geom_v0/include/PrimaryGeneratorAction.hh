@@ -66,8 +66,13 @@ public:
     void  SetStartEvent(G4int n) { fStartEvent = n; }
     G4int GetStartEvent() { return fStartEvent; }
 
+    void  SetEventOffset(G4int n) { fEventOffset = n; }
+    G4int GetEventOffset() { return fEventOffset; }
+
     void     SetMuonFileName(G4String s) { fMuonFileName = s; }
     G4String GetMuonFileName() { return fMuonFileName; }
+
+    void ReadInMuonFile();
 
 private:
     struct Muon_t {
@@ -77,16 +82,15 @@ private:
 	    cosX, cosY, cosZ;
     };
 
-private:
-    void ReadInMuonFile();
 
 private:
     G4int fNevents;
-    G4int fStartEvent;
+    G4int fEventOffset; /// offset in global G4Event ID
+    G4int fStartEvent; /// Where to start when reading in muons from input muon file
     G4String fMuonFileName;
     std::ifstream* fMuonFile;
 
-    G4ParticleGun*  fParticleGun; // pointer a to G4 gun class
+    G4ParticleGun*  fParticleGun; /// pointer a to G4 gun class
     G4Box* fEnvelopeBox;
     std::vector<Muon_t> fMuons;
 

@@ -58,6 +58,7 @@ int main(int argc,char** argv)
  *   4: integer; Start run
  *   5: integer; start event from which to read in from muon flux file
  *   6: integer; number of events to read in from the flux file
+ *   7: integer; set an event offset to be able to start in the middle of the same run, for reproducibility
  **/
 {
   std::cout<<">>> simple_geom: begin."<<std::endl;
@@ -132,6 +133,10 @@ int main(int argc,char** argv)
   if (argc > 6)
       sscanf(argv[6], "%d", &nEvents);
   uai->SetNevents(nEvents);
+  G4int eventOffset = 0;
+  if (argc > 7)
+      sscanf(argv[7], "%d", &eventOffset);
+  uai->SetEventOffset(eventOffset);
 
   runManager->SetUserInitialization(uai);
 

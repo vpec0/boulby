@@ -19,7 +19,8 @@ PrimaryGeneratorAction::PrimaryGeneratorAction()
       fParticleGun(0),
       fEnvelopeBox(0),
       fNevents(-1), // read in all events in the file
-      fStartEvent(0), // start from 1st entry
+      fEventOffset(0), // start from 1st entry -- global event ID
+      fStartEvent(0), // start from 1st entry -- in input muon file
       fMuonFileName(""),
       fMuonFile(0)
 {
@@ -38,13 +39,14 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(const char* fname, G4int nevents,
       fParticleGun(0),
       fEnvelopeBox(0),
       fNevents(nevents), // read in all events in the file
+      fEventOffset(0), // start from 1st entry -- global event ID
       fStartEvent(startevent), // start from 1st entry
       fMuonFileName(fname),
       fMuonFile(0)
 {
     fAnaM = AnaManager::GetManager();
 
-    ReadInMuonFile();
+    //ReadInMuonFile();
 
     G4int n_particle = 1;
     fParticleGun  = new G4ParticleGun(n_particle);
@@ -70,7 +72,8 @@ void PrimaryGeneratorAction::ReadInMuonFile()
     if( !fMuonFile->is_open() ) { cout<<"couldn't find muon file... bye "<<endl; return;}
     else cout<<"Loading this muon file: "<<fMuonFileName<<endl;
 
-    cout<<"Starting at line: "<<fStartEvent<<endl;
+    cout<<"Starting at line: "<<fStartEvent
+	<<" + offset " << fEventOffset <<endl;
     cout<<"Will read ";
     if (fNevents >= 0)
 	cout<<fNevents;
@@ -79,9 +82,10 @@ void PrimaryGeneratorAction::ReadInMuonFile()
     cout<<" entries in the file."<<endl;
 
     // skip entries if asked for
-    if (fStartEvent > 0) {
+    G4int skip = fStartEvent + fEventOffset;
+    if (skip > 0) {
 	char buffer[256];
-	for (int i = 0; i < fStartEvent; ++i) {
+	for (int i = 0; i < skip; ++i) {
 	    fMuonFile->getline(buffer, 255);
 	}
     }
@@ -112,6 +116,12 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
 
     G4int eventNo = anEvent->GetEventID();
+    // cout<<"Changing event number in PrimaryGeneratorAction: "
+    // 	<<eventNo<<" to ";
+    eventNo += fEventOffset;
+    // cout<<eventNo<<endl;
+    anEvent->SetEventID(eventNo);
+
     static const G4int size = fMuons.size();
 
 
@@ -132,7 +142,8 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
     Muon_t muon;
 
-    G4int entry = eventNo % size;
+    // start taking muons from the beginning if not enough events read in
+    G4int entry = (eventNo - fEventOffset) % size;
 
     muon = fMuons[entry];
 
