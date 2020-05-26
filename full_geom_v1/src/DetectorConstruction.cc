@@ -123,6 +123,13 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 	     <<std::endl;
     std::cout<<"HALL_D : "<<HALL_D<<", HALL_H : "<<HALL_H<<std::endl;
 
+    std::cout<<"Space above WT: "<<(HALL_Z+0.5*HALL_H - WT_Z - 0.5*WT_H)<<std::endl
+	     <<"Space on the sides of WT - X: "
+	     <<(HALL_X+0.5*HALL_D - WT_X - 0.5*WT_D)<<std::endl
+	     <<"Space on the sides of WT - Y: "
+	     <<(HALL_Y+0.5*HALL_D - WT_Y - 0.5*WT_D)<<std::endl;
+
+
     //
     // steel support shielding
     //

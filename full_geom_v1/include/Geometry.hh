@@ -271,7 +271,7 @@ namespace Geometry {
     // const double HALL_H = WT_H + HALL_SPACE_TOP + STEEL_H;
     const double HALL_X = TPC_X;
     const double HALL_Y = TPC_Y;
-    const double HALL_Z = WT_Z + - 0.5*WT_H - 0.5*STEEL_H + 0.5*HALL_H;
+    const double HALL_Z = WT_Z - 0.5*WT_H - STEEL_H + 0.5*HALL_H;
 
     // Rock
     const double ROCK_W = HALL_D + 2*ROCK_SPACE_SIDE;
