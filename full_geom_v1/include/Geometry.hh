@@ -60,9 +60,12 @@ namespace Geometry {
     const double TPC_H = 2.5 * m; // height
     const double TPC_D = 3.5 * m; // diameter
     // position - active volume centered
-    const double TPC_X = 0.;
+    // making this to be calculated from the distance of WT from the wall //const double TPC_X = 0.;
+    const double WT_FROM_WALL_OFFSET = 5*m;
     const double TPC_Y = 0.;
     const double TPC_Z = 0.;
+    // fix X position of the hall to 0
+    const double HALL_X = 0.;
 
 
     // reflective cover
@@ -113,9 +116,9 @@ namespace Geometry {
 
     // Water tank
     const G4String  WT_MATERIAL = "Water";
-    const double WT_THICKNESS_TOP = 3*m;
+    const double WT_THICKNESS_TOP = 3.5*m;
     const double WT_THICKNESS_BOTTOM = 1.5*m;
-    const double WT_THICKNESS_SIDE = 4*m;
+    const double WT_THICKNESS_SIDE = 3.5*m;//4*m;
 
     // Bottom steel shielding
     const G4String  STEEL_MATERIAL = "Steel";
@@ -140,6 +143,20 @@ namespace Geometry {
     // World
     const G4String  WORLD_MATERIAL = "Vacuum";
 
+
+    // external Xe container
+    const G4String  PE_MATERIAL = "PE";
+    const double    EXTERNAL_PE_THICKNESS = 20*cm;
+
+    const G4String  EXTERNAL_XE_MATERIAL = "Xe_External";
+    const double EXTERNAL_XE_D = 221*cm;
+    const double EXTERNAL_XE_H = 221*cm;
+    const double EXTERNAL_XE_WALL_X_OFFSET = 2*m;
+
+    const double EXTERNAL_XE_Y = 0.;
+    const double EXTERNAL_XE_Z = 0.;
+
+
     // helper variable
     // envelope spacing
     const double ENV_SPACING = 0.5*mm;
@@ -148,39 +165,89 @@ namespace Geometry {
     /// ========== Derived properties ==========
     /// - necessary to build the whole hierarchy of G4 volumes
 
+    // do dimensions first
     // bottom PTFE plate
     const double PTFE_B_H = PTFE_THICKNESS;
     const double PTFE_B_D = TPC_D + 2*PTFE_THICKNESS;
+    // top PTFE plate
+    const double PTFE_T_H = PTFE_THICKNESS;
+    const double PTFE_T_D = TPC_D + 2*PTFE_THICKNESS;
+    // side PTFE tube
+    const double PTFE_S_D_INNER = TPC_D;
+    const double PTFE_S_D_OUTER = TPC_D + 2*PTFE_THICKNESS;
+    const double PTFE_S_H = TPC_H + RFR_H;
+    // RFR cylinder
+    const double RFR_D = TPC_D;
+    // PMT array cylinder
+    const double PMT_ARR_D = PTFE_S_D_OUTER;
+    // Tpc envelope size
+    const double TPC_ENV_H = TPC_H + PTFE_B_H + RFR_H + PMT_ARR_H; // TPC_ENV is in LXe, LXe level starts below top PTFE
+    const double TPC_ENV_D = PTFE_S_D_OUTER;
+    // skin layer (cylinder)
+    const double SKIN_H = TPC_ENV_H + SKIN_THICK_BOTTOM;
+    const double SKIN_D = TPC_ENV_D + 2*SKIN_THICK_SIDE;
+    // top dome (cylinder)
+    //
+    // stretches from top level of LXe, contains
+    // top PTFE layer, top PMT array, and to top dome spanning over
+    // the detector
+    const double DOME_H = DOME_HH + PMT_ARR_H + PTFE_THICKNESS;
+    const double DOME_D = SKIN_D;
+    // Inner detector
+    const double ID_ENV_D = SKIN_D;
+    const double ID_ENV_H = SKIN_H + DOME_H;
+    // ICV
+    const double ICV_D = ID_ENV_D + 2*ICV_THICKNESS;
+    const double ICV_H = ID_ENV_H + 2*ICV_THICKNESS;
+    // Cryo vacuum
+    const double VAC_D = ICV_D + 2*VAC_THICKNESS;
+    const double VAC_H = ICV_H + 2*VAC_THICKNESS;
+    /// OCV
+    const double OCV_D = VAC_D + 2*OCV_THICKNESS;
+    const double OCV_H = VAC_H + 2*OCV_THICKNESS;
+    /// GdLS - scintillator around the cryostat
+    const double GDLS_D = OCV_D + 2*GDLS_THICKNESS;
+    const double GDLS_H = OCV_H + 2*GDLS_THICKNESS;
+    /// Water tank
+    const double WT_D = GDLS_D + 2*WT_THICKNESS_SIDE;
+    const double WT_H = GDLS_H + WT_THICKNESS_TOP + WT_THICKNESS_BOTTOM;
+    // Bottom steel shielding
+    const double STEEL_D = GDLS_D + 2*STEEL_OVERLAP;
+    // Rock
+    const double ROCK_W = HALL_D + 2*ROCK_SPACE_SIDE;
+    const double ROCK_H = HALL_H + ROCK_SPACE_TOP + ROCK_SPACE_BOTTOM;
+    // World
+    const double WORLD_W = 2*ROCK_W;
+    const double WORLD_H = 2*ROCK_H;
+
+    // External Xe Tank
+    const double EXTERNAL_PE_D = EXTERNAL_XE_D + 2.*EXTERNAL_PE_THICKNESS;
+    const double EXTERNAL_PE_H = EXTERNAL_XE_H + 2.*EXTERNAL_PE_THICKNESS;
+
+
+
+    // X offset of TPC
+    const double TPC_X = 0. - 0.5*HALL_D + WT_FROM_WALL_OFFSET + 0.5*WT_D;
+
     // positioning in absolute coordinates (TPC placed at 0.)
     const double PTFE_B_X = TPC_X;
     const double PTFE_B_Y = TPC_Y;
     const double PTFE_B_Z = TPC_Z - 0.5*TPC_H - RFR_H - 0.5*PTFE_THICKNESS;
 
 
-    // top PTFE plate
-    const double PTFE_T_H = PTFE_THICKNESS;
-    const double PTFE_T_D = TPC_D + 2*PTFE_THICKNESS;
     const double PTFE_T_X = TPC_X;
     const double PTFE_T_Y = TPC_Y;
     const double PTFE_T_Z = TPC_Z + 0.5*TPC_H + 0.5*PTFE_THICKNESS;
 
-    // side PTFE tube
-    const double PTFE_S_D_INNER = TPC_D;
-    const double PTFE_S_D_OUTER = TPC_D + 2*PTFE_THICKNESS;
-    const double PTFE_S_H = TPC_H + RFR_H;
     const double PTFE_S_X = TPC_X;
     const double PTFE_S_Y = TPC_Y;
     const double PTFE_S_Z = TPC_Z - 0.5*RFR_H; // off-set by RFR
 
 
-    // RFR cylinder
-    const double RFR_D = TPC_D;
     const double RFR_X = TPC_X;
     const double RFR_Y = TPC_Y;
     const double RFR_Z = TPC_Z - 0.5*TPC_H - 0.5*RFR_H;
 
-    // PMT array cylinder
-    const double PMT_ARR_D = PTFE_S_D_OUTER;
     // top PMT array
     const double PMT_T_X = TPC_X;
     const double PMT_T_Y = TPC_Y;
@@ -190,77 +257,43 @@ namespace Geometry {
     const double PMT_B_Y = TPC_Y;
     const double PMT_B_Z = PTFE_B_Z - 0.5*PTFE_B_H - 0.5*PMT_ARR_H;
 
-    // Tpc envelope size
-    const double TPC_ENV_H = TPC_H + PTFE_B_H + RFR_H + PMT_ARR_H; // TPC_ENV is in LXe, LXe level starts below top PTFE
-    const double TPC_ENV_D = PTFE_S_D_OUTER;
     const double TPC_ENV_X = TPC_X;
     const double TPC_ENV_Y = TPC_Y;
     const double TPC_ENV_Z = PTFE_S_Z - 0.5*PMT_ARR_H - 0.5*PTFE_B_H;
 
 
-    // skin layer (cylinder)
-    const double SKIN_H = TPC_ENV_H + SKIN_THICK_BOTTOM;
-    const double SKIN_D = TPC_ENV_D + 2*SKIN_THICK_SIDE;
     const double SKIN_X = TPC_X;
     const double SKIN_Y = TPC_Y;
     const double SKIN_Z = TPC_ENV_Z - 0.5*SKIN_THICK_BOTTOM;
 
-    // top dome (cylinder)
-    //
-    // stretches from top level of LXe, contains
-    // top PTFE layer, top PMT array, and to top dome spanning over
-    // the detector
-    const double DOME_H = DOME_HH + PMT_ARR_H + PTFE_THICKNESS;
-    const double DOME_D = SKIN_D;
     const double DOME_X = TPC_X;
     const double DOME_Y = TPC_Y;
     const double DOME_Z = TPC_ENV_Z + 0.5*TPC_ENV_H + 0.5*DOME_H;
 
-    // Inner detector
-    const double ID_ENV_D = SKIN_D;
-    const double ID_ENV_H = SKIN_H + DOME_H;
     const double ID_ENV_X = TPC_X;
     const double ID_ENV_Y = TPC_Y;
     const double ID_ENV_Z = SKIN_Z + 0.5*DOME_H;
 
-
-    // ICV
-    const double ICV_D = ID_ENV_D + 2*ICV_THICKNESS;
-    const double ICV_H = ID_ENV_H + 2*ICV_THICKNESS;
     const double ICV_X = TPC_X;
     const double ICV_Y = TPC_Y;
     const double ICV_Z = ID_ENV_Z;
 
-    // Cryo vacuum
-    const double VAC_D = ICV_D + 2*VAC_THICKNESS;
-    const double VAC_H = ICV_H + 2*VAC_THICKNESS;
     const double VAC_X = TPC_X;
     const double VAC_Y = TPC_Y;
     const double VAC_Z = ICV_Z;
 
-    /// OCV
-    const double OCV_D = VAC_D + 2*OCV_THICKNESS;
-    const double OCV_H = VAC_H + 2*OCV_THICKNESS;
     const double OCV_X = TPC_X;
     const double OCV_Y = TPC_Y;
     const double OCV_Z = VAC_Z;
 
-    /// GdLS - scintillator around the cryostat
-    const double GDLS_D = OCV_D + 2*GDLS_THICKNESS;
-    const double GDLS_H = OCV_H + 2*GDLS_THICKNESS;
     const double GDLS_X = TPC_X;
     const double GDLS_Y = TPC_Y;
     const double GDLS_Z = OCV_Z;
 
-    /// Water tank
-    const double WT_D = GDLS_D + 2*WT_THICKNESS_SIDE;
-    const double WT_H = GDLS_H + WT_THICKNESS_TOP + WT_THICKNESS_BOTTOM;
     const double WT_X = TPC_X;
     const double WT_Y = TPC_Y;
     const double WT_Z = GDLS_Z + 0.5*WT_THICKNESS_TOP - 0.5*WT_THICKNESS_BOTTOM;
 
-    // Bottom steel shielding
-    const double STEEL_D = GDLS_D + 2*STEEL_OVERLAP;
     const double STEEL_X = TPC_X;
     const double STEEL_Y = TPC_Y;
     const double STEEL_Z = WT_Z - 0.5*WT_H - 0.5*STEEL_H;
@@ -269,21 +302,20 @@ namespace Geometry {
     /// Hall
     // const double HALL_D = WT_D + 2*HALL_SPACE_SIDE;
     // const double HALL_H = WT_H + HALL_SPACE_TOP + STEEL_H;
-    const double HALL_X = TPC_X;
-    const double HALL_Y = TPC_Y;
+    //const double HALL_X = TPC_X;
+    const double HALL_Y = WT_Y;
     const double HALL_Z = WT_Z - 0.5*WT_H - STEEL_H + 0.5*HALL_H;
 
-    // Rock
-    const double ROCK_W = HALL_D + 2*ROCK_SPACE_SIDE;
-    const double ROCK_H = HALL_H + ROCK_SPACE_TOP + ROCK_SPACE_BOTTOM;
-    const double ROCK_X = TPC_X;
-    const double ROCK_Y = TPC_Y;
+    const double ROCK_X = HALL_X;
+    const double ROCK_Y = HALL_Y;
     const double ROCK_Z = HALL_Z + 0.5*ROCK_SPACE_TOP - 0.5*ROCK_SPACE_BOTTOM;
 
-    // World
-    const double WORLD_W = 2*ROCK_W;
-    const double WORLD_H = 2*ROCK_H;
 
+    // External Xe tank
+    const double EXTERNAL_PE_X = HALL_X + 0.5*HALL_D - EXTERNAL_XE_WALL_X_OFFSET - 0.5*EXTERNAL_PE_D;
+    const double EXTERNAL_PE_Y = EXTERNAL_XE_Y;
+    const double EXTERNAL_PE_Z = EXTERNAL_XE_Z;
+    const double EXTERNAL_XE_X = EXTERNAL_PE_X;
 
     // Definition of materials
 
@@ -299,7 +331,9 @@ namespace Geometry {
 	{"Rock", "NaCl"},
 	{"Water", "G4_WATER"},
 	{"GdLS", "GdLS"},
-	{"Steel", "G4_STAINLESS-STEEL"}
+	{"Steel", "G4_STAINLESS-STEEL"},
+	{"PE", "G4_POLYETHYLENE"},
+	{"Xe_External", "Xe_External"},
     };
 
 

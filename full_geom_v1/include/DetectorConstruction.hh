@@ -24,6 +24,9 @@ public:
 
 private:
     void PrepareMaterials(G4NistManager* nist);
+    G4VPhysicalVolume* ConstructExternalXeTank(G4LogicalVolume* logicHall,
+					       G4bool checkOverlaps,
+					       G4NistManager* nist);
 
 protected:
     G4LogicalVolume*  fScoringVolume;

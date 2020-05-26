@@ -175,8 +175,11 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 			  false,                 //no boolean operation
 			  0,                     //copy number
 			  checkOverlaps);        //overlaps checking
-    std::cout<<"WT_Z : "<<WT_Z<<", WT_H : "<<WT_H<<std::endl;
-    std::cout<<"WT_Z : "<<WT_Z<<", WT_H : "<<WT_H<<", WT_D : "<<WT_D<<std::endl;
+    std::cout<<"WT_X : "<<WT_X
+	     <<", WT_Y : "<<WT_Y
+	     <<", WT_Z : "<<WT_Z
+	     <<std::endl;
+    std::cout<<"WT_H : "<<WT_H<<", WT_D : "<<WT_D<<std::endl;
 
     //
     // Gd Doped Liquid Scintillator
@@ -416,7 +419,12 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 			  false,                 //no boolean operation
 			  0,                     //copy number
 			  checkOverlaps);        //overlaps checking
-    std::cout<<"TPC_ENV_Z : "<<TPC_ENV_Z<<", TPC_ENV_H : "<<TPC_ENV_H<<std::endl;
+    std::cout<<"TPC_ENV_X : "<<TPC_ENV_X
+	     <<", TPC_ENV_Y : "<<TPC_ENV_Y
+	     <<", TPC_ENV_Z : "<<TPC_ENV_Z
+	     <<std::endl;
+    std::cout<<"TPC_ENV_H : "<<TPC_ENV_H
+	     <<", TPC_ENV_D : "<<TPC_ENV_D<<std::endl;
 
 
     //
@@ -466,7 +474,12 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 			  false,                 //no boolean operation
 			  0,                     //copy number
 			  checkOverlaps);        //overlaps checking
-    std::cout<<"TPC_Z : "<<TPC_Z<<", TPC_H : "<<TPC_H<<std::endl;
+    std::cout<<"TPC_X : "<<TPC_X
+	     <<", TPC_Y : "<<TPC_Y
+	     <<", TPC_Z : "<<TPC_Z
+	     <<std::endl;
+    std::cout<<"TPC_H : "<<TPC_H
+	     <<", TPC_D : "<<TPC_D<<std::endl;
 
 
     //
@@ -535,13 +548,14 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 			  checkOverlaps);        //overlaps checking
 
 
+    ConstructExternalXeTank(logicHall, checkOverlaps, nist);
+
 
   //
   //always return the physical World
   //
   return physWorld;
 }
-
 
 void DetectorConstruction::ConstructSDandField()
 {
@@ -566,6 +580,62 @@ void DetectorConstruction::ConstructSDandField()
     SetSensitiveDetector("WT", sd_wt);
 
 }
+
+
+G4VPhysicalVolume* DetectorConstruction::ConstructExternalXeTank(G4LogicalVolume* logicHall,
+								 G4bool checkOverlaps,
+								 G4NistManager* nist)
+{
+    // place an external tank somewhere in the hall
+    // Goal is to measure Xe exposure to cosmogenic neutrons and activation of 1XXXe
+
+    // PE shielding
+    G4Material* pe_mat = nist->FindOrBuildMaterial(material_map.at(PE_MATERIAL));
+    G4Tubs* solidPE =
+	new G4Tubs("PE",
+		   0., 0.5*EXTERNAL_PE_D, 0.5*EXTERNAL_PE_H, 0., 360.*deg );
+    G4LogicalVolume* logicPE =
+	new G4LogicalVolume(solidPE,          //its solid
+			    pe_mat,           //its material
+			    "External_PE");            //its name
+    G4ThreeVector posPE(EXTERNAL_PE_X-HALL_X,EXTERNAL_PE_Y-HALL_Y,EXTERNAL_PE_Z-HALL_Z);
+    G4VPhysicalVolume* physPE =
+	new G4PVPlacement(0,                     //no rotation
+			  posPE,
+			  logicPE,            //its logical volume
+			  "External_PE",               //its name
+			  logicHall,                     //its mother  volume
+			  false,                 //no boolean operation
+			  0,                     //copy number
+			  checkOverlaps);        //overlaps checking
+
+
+    // Inner Xe containter
+    G4Material* xe_mat = nist->FindOrBuildMaterial(material_map.at(EXTERNAL_XE_MATERIAL));
+    G4Tubs* solidXe =
+	new G4Tubs("Xe",
+		   0., 0.5*EXTERNAL_XE_D, 0.5*EXTERNAL_XE_H, 0., 360.*deg );
+    G4LogicalVolume* logicXe =
+	new G4LogicalVolume(solidXe,          //its solid
+			    pe_mat,           //its material
+			    "External_Xe");            //its name
+    G4ThreeVector posXe(EXTERNAL_XE_X-EXTERNAL_PE_X,EXTERNAL_XE_Y-EXTERNAL_PE_Y,EXTERNAL_XE_Z-EXTERNAL_PE_Z);
+    G4VPhysicalVolume* physXe =
+	new G4PVPlacement(0,                     //no rotation
+			  posXe,
+			  logicXe,            //its logical volume
+			  "External_Xe",               //its name
+			  logicPE,                     //its mother  volume
+			  false,                 //no boolean operation
+			  0,                     //copy number
+			  checkOverlaps);        //overlaps checking
+
+
+
+    return physPE;
+
+}
+
 
 
 void DetectorConstruction::PrepareMaterials(G4NistManager* nist)
@@ -605,5 +675,7 @@ void DetectorConstruction::PrepareMaterials(G4NistManager* nist)
     GdLS->AddElement(nist->FindOrBuildElement("O"),  .109*perCent);
     GdLS->AddElement(nist->FindOrBuildElement("Gd"),  .103*perCent);
 
+    G4Material* gxe = nist->FindOrBuildMaterial("G4_Xe");
+    nist->BuildMaterialWithNewDensity("Xe_External", "G4_Xe", 2.*gxe->GetDensity());
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

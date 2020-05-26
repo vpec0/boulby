@@ -31,3 +31,6 @@
 /vis/geometry/set/colour Side_PTFE   0 0.90 0.80 0.15 1.00
 /vis/geometry/set/colour Bottom_PTFE 0 0.90 0.80 0.15 1.00
 #
+# external Xe container
+/vis/geometry/set/colour External_Xe 0 0.53 0.81 0.98 1.00
+/vis/geometry/set/colour External_PE 0 0.98 0.98 0.98 1.00
