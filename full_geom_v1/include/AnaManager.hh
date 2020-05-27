@@ -60,6 +60,8 @@ public:
 	fHisto[detector]->Fill(Form("%d", pdg), Edep); }
 
 
+    void SetN137Xe(Int_t n137xe);
+
     void AddTrkPdg(G4int trkId, G4int pdg) { fTrkPdg[trkId] = pdg; }
     G4int GetTrkPdg(G4int trkId) { return fTrkPdg[trkId]; }
 

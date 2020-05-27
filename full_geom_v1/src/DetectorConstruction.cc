@@ -13,6 +13,7 @@
 
 #include "Geometry.hh"
 #include "SD.hh"
+#include "SDExternal.hh"
 
 
 using namespace Geometry;
@@ -551,10 +552,13 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     ConstructExternalXeTank(logicHall, checkOverlaps, nist);
 
 
-  //
-  //always return the physical World
-  //
-  return physWorld;
+    // print the table of materials
+    G4cout << *(G4Material::GetMaterialTable()) << G4endl;
+
+    //
+    //always return the physical World
+    //
+    return physWorld;
 }
 
 void DetectorConstruction::ConstructSDandField()
@@ -578,6 +582,10 @@ void DetectorConstruction::ConstructSDandField()
     SD* sd_wt = new SD("sdWt","wt", AnaManager::kWt);
     G4SDManager::GetSDMpointer()->AddNewDetector(sd_wt);
     SetSensitiveDetector("WT", sd_wt);
+
+    SDExternal* sd_extxe = new SDExternal("sdExternal_Xe");
+    G4SDManager::GetSDMpointer()->AddNewDetector(sd_extxe);
+    SetSensitiveDetector("External_Xe", sd_extxe);
 
 }
 
@@ -617,7 +625,7 @@ G4VPhysicalVolume* DetectorConstruction::ConstructExternalXeTank(G4LogicalVolume
 		   0., 0.5*EXTERNAL_XE_D, 0.5*EXTERNAL_XE_H, 0., 360.*deg );
     G4LogicalVolume* logicXe =
 	new G4LogicalVolume(solidXe,          //its solid
-			    pe_mat,           //its material
+			    xe_mat,           //its material
 			    "External_Xe");            //its name
     G4ThreeVector posXe(EXTERNAL_XE_X-EXTERNAL_PE_X,EXTERNAL_XE_Y-EXTERNAL_PE_Y,EXTERNAL_XE_Z-EXTERNAL_PE_Z);
     G4VPhysicalVolume* physXe =
@@ -629,6 +637,13 @@ G4VPhysicalVolume* DetectorConstruction::ConstructExternalXeTank(G4LogicalVolume
 			  false,                 //no boolean operation
 			  0,                     //copy number
 			  checkOverlaps);        //overlaps checking
+
+    std::cout<<"EXTERNAL_XE_X : "<<EXTERNAL_XE_X
+	     <<", EXTERNAL_XE_Y : "<<EXTERNAL_XE_Y
+	     <<", EXTERNAL_XE_Z : "<<EXTERNAL_XE_Z
+	     <<std::endl;
+    std::cout<<"EXTERNAL_XE_H : "<<EXTERNAL_XE_H
+	     <<", EXTERNAL_XE_D : "<<EXTERNAL_XE_D<<std::endl;
 
 
 
@@ -675,7 +690,8 @@ void DetectorConstruction::PrepareMaterials(G4NistManager* nist)
     GdLS->AddElement(nist->FindOrBuildElement("O"),  .109*perCent);
     GdLS->AddElement(nist->FindOrBuildElement("Gd"),  .103*perCent);
 
-    G4Material* gxe = nist->FindOrBuildMaterial("G4_Xe");
-    nist->BuildMaterialWithNewDensity("Xe_External", "G4_Xe", 2.*gxe->GetDensity());
+    //G4Material* gxe = nist->FindOrBuildMaterial("G4_Xe");
+    nist->BuildMaterialWithNewDensity("Xe_External", "G4_Xe", 11.8*0.001*g/cm3);
+
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

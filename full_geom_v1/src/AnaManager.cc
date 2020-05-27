@@ -201,6 +201,11 @@ void AnaManager::SetEdep(Double_t time, Double_t Edep0, Double_t Edep1,
 }
 
 
+void AnaManager::SetN137Xe(Int_t n137xe)
+{
+    fEvent.n137Xe = n137xe;
+}
+
 // Double_t AnaManager::GetEdep(Int_t em, Int_t detector)
 // {
 //     Int_t& n = *(&fEvent.n_tpc_em + 4*(em==kEm) + detector);

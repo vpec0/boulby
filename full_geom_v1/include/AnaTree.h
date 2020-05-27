@@ -65,7 +65,9 @@ namespace AnaTree {
     DOUBLE_ARR2(Edep_gdls, n_gdls, kNDepositionClasses);	\
     DOUBLE_ARR2(Edep_wt, n_wt, kNDepositionClasses)		\
 
-
+    // External Xe tank 136Xe->137Xe activation
+#define EXTERNAL_LIST				\
+    INT(n137Xe)					\
 
 
 
@@ -87,6 +89,8 @@ namespace AnaTree {
 #define DOUBLE_ARR2(var, size1, size2) Double_t var[MAX_DEPOSITIONS][size2]
 
 	DEPOSITS_LIST;
+
+	EXTERNAL_LIST;
     };
 
 #undef INT
@@ -118,6 +122,8 @@ namespace AnaTree {
 #define DOUBLE_ARR2(var, size1, size2) tree->Branch(#var, event.var, Form(#var"["#size1"][%d]/D", size2))
 	DEPOSITS_LIST;
 
+	EXTERNAL_LIST;
+
 	return tree;
     }
 
@@ -141,6 +147,8 @@ namespace AnaTree {
 	NEUTRON_LIST;
 
 	DEPOSITS_LIST;
+
+	EXTERNAL_LIST;
 
 	return tree;
     }
