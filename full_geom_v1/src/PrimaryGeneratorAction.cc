@@ -125,14 +125,15 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     static const G4int size = fMuons.size();
 
 
-    if (!size) {
-	G4ThreeVector pos(0.,0.,0.);
+    if (!size) {// generate neutrons inside external Xe storage
+	G4ThreeVector pos(11695.,0.,0.);
+	//std::cout<<"Generating neutron at position "<<pos<<std::endl;
 
 	fParticleGun->
 	    SetParticleDefinition(fParticleTable->FindParticle(2112));
 
 	fParticleGun->SetParticlePosition(pos);
-	fParticleGun->SetParticleEnergy(20.*CLHEP::MeV);
+	fParticleGun->SetParticleEnergy(20.*CLHEP::keV);
 	fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0,0,-1));
 
 	fParticleGun->GeneratePrimaryVertex(anEvent);
