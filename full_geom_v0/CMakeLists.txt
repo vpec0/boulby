@@ -43,7 +43,9 @@ include_directories(${ROOT_INCLUDE_DIRS})
 
 # Set compilation flags
 # to suppress warning message:
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable -Wno-unused-parameter -Wno-unused-private-field -Wno-shadow")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable -Wno-unused-parameter -Wno-shadow")
+
+#add_definitions(\$\(ADDITIONAL_CXX_DEFINES\))
 
 
 #----------------------------------------------------------------------------
