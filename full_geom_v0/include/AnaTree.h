@@ -11,7 +11,7 @@
 namespace AnaTree {
 
     const int	MAX_NEUTRONS  = 8192;	// just hoping this will never be exceeded
-    const int MAX_DEPOSITIONS = 56;	// maximum energy deposits, bunched in 1 us, to be stored
+    const int MAX_DEPOSITIONS = 256;	// maximum energy deposits, bunched in 100 ns, to be stored
 
     const int Ndetectors = 5;
 
