@@ -28,9 +28,9 @@ SD::~SD()
 
 void SD::Initialize(G4HCofThisEvent* hce)
 {
-    // std::cout<<"Constructing sensitive detector "<<fDetector
-    // 	     <<" "<<SensitiveDetectorName<<std::endl
-    // 	     <<"Creating hit collection "<<collectionName[0]<<std::endl;
+    // G4cout<<"Constructing sensitive detector "<<fDetector
+    // 	     <<" "<<SensitiveDetectorName<<G4endl
+    // 	     <<"Creating hit collection "<<collectionName[0]<<G4endl;
 
     // Create hits collection
 
@@ -65,7 +65,7 @@ G4bool SD::ProcessHits(G4Step* aStep,
   //     G4double nonionidep = aStep->GetNonIonizingEnergyDeposit();
   //     G4double startE = aStep->GetPreStepPoint()->GetTotalEnergy();
   //     G4double endE = aStep->GetPostStepPoint()->GetTotalEnergy();
-  //     std::cout<<pdg<<" hit at ("
+  //     G4cout<<pdg<<" hit at ("
   // 	       <<aStep->GetPostStepPoint()->GetPosition().x()<<","
   // 	       <<aStep->GetPostStepPoint()->GetPosition().y()<<","
   // 	       <<aStep->GetPostStepPoint()->GetPosition().z()<<")"
@@ -77,7 +77,7 @@ G4bool SD::ProcessHits(G4Step* aStep,
   // 	       <<", 1st secondary pdg = "<<secpdg
   // 	       <<", DE = "<<(startE-endE)
   // 	       <<", Total KinE = "<<totalKine
-  // 	       <<std::endl;
+  // 	       <<G4endl;
   // }
 
 
@@ -95,24 +95,35 @@ G4bool SD::ProcessHits(G4Step* aStep,
 
   fHitsCollection->insert( newHit );
 
+#ifdef DEBUG
+
+  if (fDetector == AnaManager::kTpc && (pdg/10000) == 100054) { // print out only Xe depositions
+      G4cout<<"Created hit from pdg="<<pdg
+	    <<" edep="<<edep
+	    <<" time="<<aStep->GetPostStepPoint()->GetGlobalTime()
+	    <<G4endl;
+  }
+
+#endif // DEBUG
+
   // fill the histogram
   fAnaM->FillPDGEdep(fDetector, pdg, edep);
 
   // G4double nonionidep = aStep->GetNonIonizingEnergyDeposit();
-  // std::cout<<pdg<<" hit at ("
+  // G4cout<<pdg<<" hit at ("
   // 	   <<aStep->GetPostStepPoint()->GetPosition().x()<<","
   // 	   <<aStep->GetPostStepPoint()->GetPosition().y()<<","
   // 	   <<aStep->GetPostStepPoint()->GetPosition().z()<<")"
   // 	   <<", Edep = "<<edep
   // 	   <<", EdepNonIon = "<<nonionidep
-  // 	   <<std::endl;
+  // 	   <<G4endl;
 
   // if (pdg == 2112) {
-  //     std::cout<<"neutron hit at ("
+  //     G4cout<<"neutron hit at ("
   // 	       <<aStep->GetPostStepPoint()->GetPosition().x()<<","
   // 	       <<aStep->GetPostStepPoint()->GetPosition().y()<<","
   // 	       <<aStep->GetPostStepPoint()->GetPosition().z()<<")"
-  // 	       <<", Edep = "<<edep<<std::endl;
+  // 	       <<", Edep = "<<edep<<G4endl;
   // }
   //newHit->Print();
 
@@ -128,7 +139,7 @@ void SD::EndOfEvent(G4HCofThisEvent*)
     if ( verboseLevel>1 ) {
 	G4int nofHits = fHitsCollection->entries();
 	G4cout << G4endl
-	       << "-------->Hits Collection: in this event they are " << nofHits
+	       << "-------->Hits Collection: in this event there are " << nofHits
 	       << " hits in the tracker chambers: " << G4endl;
 	for ( G4int i=0; i<nofHits; i++ ) (*fHitsCollection)[i]->Print();
     }
@@ -136,6 +147,39 @@ void SD::EndOfEvent(G4HCofThisEvent*)
     std::vector<G4double> edeps[kNDepositionClasses];
 
     std::vector<G4double> times;
+
+
+    // FIXME: the following code relies on the hits being sorted by deposition times! Which is not true!
+    // first need to get sort table for the collection
+    std::vector<std::size_t> sorted(fHitsCollection->GetSize());
+    std::iota(sorted.begin(), sorted.end(), 0); // initialize with sequence
+    std::sort(sorted.begin(), sorted.end(),
+	      [this](std::size_t i, std::size_t j){
+		  return (*this->fHitsCollection)[i]->GetTime() < (*this->fHitsCollection)[j]->GetTime();
+	      });
+
+    // Or simply sort the collection
+    //
+    // sort(fHitsCollection->GetVector())
+
+
+#ifdef DEBUG
+    G4int debugcounter = 100;
+    int size = sorted.size();
+
+    if (fDetector == AnaManager::kTpc) {
+	G4cout<<"N hits in the collection: "<<size<<G4endl
+	      <<"First 20 hit times and their sort order: "<<G4endl;
+	if (size > 20) size = 20;
+	for (std::size_t i = 0; i< size; ++i) {
+	    G4cout<<(*fHitsCollection)[i]->GetTime()<<": "<<sorted[i]<<G4endl;
+	}
+
+	G4cout<<"Will print "<<debugcounter
+	      <<" depositions by Xe in TPC to 100 ns windows:"<<G4endl;
+    }
+
+#endif // DEBUG
 
     G4double total[kNDepositionClasses] = {};
 
@@ -145,10 +189,12 @@ void SD::EndOfEvent(G4HCofThisEvent*)
     G4int	pdg  = 0;
     EDepositionClass depcls;
     // process hit collections and pass data to ana manager
-    for (auto hit: *(fHitsCollection->GetVector())) {
+    for (auto i: sorted) {
+	auto hit = (*fHitsCollection)[i];
 	time = hit->GetTime();
 	edep = hit->GetEdep();
 	pdg = hit->GetPdg();
+
 	if (time > gate) {
 	    if ( gate > 0. && (total[0] > 0. || total[1] > 0. ||
 			       total[2] > 0. || total[3] > 0.) ) {
@@ -162,7 +208,7 @@ void SD::EndOfEvent(G4HCofThisEvent*)
 	    memset(total, 0, sizeof(total)) ;
 	}
 	if (edep == 0.) continue;
-	if (pdg == 22 || pdg == 11 || pdg == -1)
+	if (pdg == 22 || pdg == 11 || pdg == -11)
 	    depcls = kEm;
 	else if (pdg == -13 || pdg == 13)
 	    depcls = kMu;
@@ -171,6 +217,22 @@ void SD::EndOfEvent(G4HCofThisEvent*)
 	else
 	    depcls = kOther;
 	total[depcls] += edep;
+
+#ifdef DEBUG
+
+	if (fDetector == AnaManager::kTpc &&
+	    debugcounter > 0 &&
+	    pdg/10000 == 100054)
+	    {
+		G4cout<<"Adding hit "<<pdg<<", "<<edep<<", "<<time
+		      <<" ns to window "
+		      <<(gate - gateWindow)<<" to "<<gate<<G4endl;
+
+		--debugcounter;
+	    }
+
+#endif // DEBUG
+
     }
 
 
@@ -193,9 +255,9 @@ void SD::EndOfEvent(G4HCofThisEvent*)
     // 	G4cout<<"no depositions"<<G4endl;
     // G4cout<<G4endl;
 
-    //     std::cout<<" Energy deposited in detector "<<fDetector<<std::endl
-    // 	       <<"  EM: "<<total_em<<std::endl
-    // 	       <<"  nonEM: "<<total_non_em<<std::endl;
+    //     G4cout<<" Energy deposited in detector "<<fDetector<<G4endl
+    // 	       <<"  EM: "<<total_em<<G4endl
+    // 	       <<"  nonEM: "<<total_non_em<<G4endl;
     for (int i = 0; i < times.size(); ++i) {
 	if (i == AnaTree::MAX_DEPOSITIONS) break;
 	fAnaM->SetEdep(times[i], edeps[0][i], edeps[1][i], edeps[2][i], edeps[3][i], fDetector);

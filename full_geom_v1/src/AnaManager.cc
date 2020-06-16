@@ -54,6 +54,10 @@ AnaManager::~AnaManager()
 
 void AnaManager::Book()
 {
+#ifdef DEBUG
+  std::cout<<"AnaManager::AnaManager(): Will printout DEBUG info."<<std::endl;
+#endif
+
   // Creating a tree container to handle histograms and ntuples.
   // This tree is associated to an output file.
   //
@@ -173,6 +177,9 @@ void AnaManager::SetEdep(Double_t time, Double_t Edep0, Double_t Edep1,
 {
     Int_t& n = *(&fEvent.n_tpc + detector);
 
+    if ( n >= AnaTree::MAX_DEPOSITIONS ) // check the limits!
+	return;
+
     Double_t* times = fEvent.Tdep_tpc
 	+ detector*AnaTree::MAX_DEPOSITIONS + n;
     (*times) = time;
@@ -183,7 +190,14 @@ void AnaManager::SetEdep(Double_t time, Double_t Edep0, Double_t Edep1,
     Edeps[1] = Edep1;
     Edeps[2] = Edep2;
     Edeps[3] = Edep3;
-    // std::cout<<"Added Edep_em "<<Edeps[n]<<" at position"<<n<<std::endl;
+#ifdef DEBUG
+    std::cout<<"For detector "<<detector
+	     <<" Added Edeps: ";
+    for (int i = 0; i < 4; i++)
+	std::cout<<Edeps[i]<<", ";
+    std::cout<<" at position"<<n
+	     <<" and time "<<time<<std::endl;
+#endif
 
     ++n;
 
