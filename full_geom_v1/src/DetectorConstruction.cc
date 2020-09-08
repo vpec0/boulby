@@ -693,5 +693,21 @@ void DetectorConstruction::PrepareMaterials(G4NistManager* nist)
     //G4Material* gxe = nist->FindOrBuildMaterial("G4_Xe");
     nist->BuildMaterialWithNewDensity("Xe_External", "G4_Xe", 11.8*0.001*g/cm3);
 
+    // define polyhalite
+    auto polyhalite = new G4Material("polyhalite",2.78*g/cm3, 6, kStateSolid );
+    // K2Ca2Mg(SO4)4·2H2O
+    // Counts of element atoms:
+    //   - K   2x
+    //   - Ca  2x
+    //   - Mg  1x
+    //   - S   4x
+    //   - O  18x
+    //   - H   4x
+    polyhalite->AddElement(nist->FindOrBuildElement("K"),  2);
+    polyhalite->AddElement(nist->FindOrBuildElement("Ca"), 2);
+    polyhalite->AddElement(nist->FindOrBuildElement("Mg"), 1);
+    polyhalite->AddElement(nist->FindOrBuildElement("S"),  4);
+    polyhalite->AddElement(nist->FindOrBuildElement("O"), 18);
+    polyhalite->AddElement(nist->FindOrBuildElement("H"),  4);
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
