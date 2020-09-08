@@ -17,9 +17,10 @@ AnaManager::AnaManager(const char* filename):
     fRootFile(0),
     fHisto {},
     fTree(0),
-    fEabs(0.), fEgap(0.) ,fLabs(0.), fLgap(0.), fEvent(),
-    fWarningMessageCount(0),
-    fTrkPdg {}
+    fEabs(0.), fEgap(0.) ,fLabs(0.), fLgap(0.),
+    fTrkPdg {},
+    fEvent(),
+    fWarningMessageCount(0)
 {
     fgManager = this;
 
@@ -33,8 +34,10 @@ AnaManager::AnaManager():
     fRootFile(0),
     fHisto {},
     fTree(0),
-    fEabs(0.), fEgap(0.) ,fLabs(0.), fLgap(0.), fEvent(),
-    fTrkPdg {}
+    fEabs(0.), fEgap(0.) ,fLabs(0.), fLgap(0.),
+    fTrkPdg {},
+    fEvent(),
+    fWarningMessageCount(0)
 {
     fgManager = this;
 
@@ -195,8 +198,8 @@ void AnaManager::SetEdep(Double_t time, Double_t Edep0, Double_t Edep1,
 	     <<" Added Edeps: ";
     for (int i = 0; i < 4; i++)
 	std::cout<<Edeps[i]<<", ";
-    std::cout<<" at position"<<n
-	     <<" and time "<<time<<std::endl;
+    std::cout<<" at position "<<n
+	     <<" and time "<<time<<" us"<<std::endl;
 #endif
 
     ++n;

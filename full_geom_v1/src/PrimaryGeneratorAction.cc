@@ -16,13 +16,13 @@ using namespace std;
 
 PrimaryGeneratorAction::PrimaryGeneratorAction()
     : G4VUserPrimaryGeneratorAction(),
-      fParticleGun(0),
-      fEnvelopeBox(0),
       fNevents(-1), // read in all events in the file
       fEventOffset(0), // start from 1st entry -- global event ID
       fStartEvent(0), // start from 1st entry -- in input muon file
       fMuonFileName(""),
-      fMuonFile(0)
+      fMuonFile(0),
+      fParticleGun(0),
+      fEnvelopeBox(0)
 {
     fAnaM = AnaManager::GetManager();
 
@@ -36,13 +36,13 @@ PrimaryGeneratorAction::PrimaryGeneratorAction()
 
 PrimaryGeneratorAction::PrimaryGeneratorAction(const char* fname, G4int nevents, G4int startevent)
     : G4VUserPrimaryGeneratorAction(),
-      fParticleGun(0),
-      fEnvelopeBox(0),
       fNevents(nevents), // read in all events in the file
       fEventOffset(0), // start from 1st entry -- global event ID
       fStartEvent(startevent), // start from 1st entry
       fMuonFileName(fname),
-      fMuonFile(0)
+      fMuonFile(0),
+      fParticleGun(0),
+      fEnvelopeBox(0)
 {
     fAnaM = AnaManager::GetManager();
 

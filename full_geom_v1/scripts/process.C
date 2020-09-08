@@ -5,7 +5,7 @@
 #define FOR(i, size) for (unsigned int i = 0; i < size; ++i)
 typedef const char* STR;
 
-void doXlog(TH1*, int which = 0);
+//void doXlog(TH1*, int which = 0);
 
 #include "common.icc"
 
@@ -16,7 +16,7 @@ void process(STR fname, STR outpref, int batchNo = 4, int Nruns = 10,
 
     // input tree
     auto tree = new TChain("events");
-    size_t size = attachFiles(tree, fname, batchNo, Nruns, basedir);
+    size_t size = attachFiles(tree, fname, batchNo, Nruns, 0, basedir);
     auto evt = new AnaTree::Event_t;
     AnaTree::resetEvent(*evt);
     AnaTree::registerTree(tree, *evt);
@@ -179,6 +179,7 @@ void process(STR fname, STR outpref, int batchNo = 4, int Nruns = 10,
 
 
 	double etot[EDepNhists] = {};
+	double tdepfirst[EDepNhists] = {};
 	double etot_class[EDepNhists][kNDepositionClasses] = {};
 	// loop over different sensitive detectors
 	for (int i = 0; i < AnaTree::Ndetectors; ++i) {
@@ -196,6 +197,7 @@ void process(STR fname, STR outpref, int batchNo = 4, int Nruns = 10,
 		    etot_class[i][k] += edep[j*kNDepositionClasses + k];
 		}
 	    }
+	    tdepfirst[i] = tdep[0];
 
 	    if(etot[i] > 0.)
 		edephists[i]->Fill(etot[i]);
@@ -324,47 +326,25 @@ void process(STR fname, STR outpref, int batchNo = 4, int Nruns = 10,
 }
 
 
-void doXlog(TH1* h, int which)
-// redo scales for x-log hists
-{
-    TAxis* axis = (which==0)?h->GetXaxis():h->GetYaxis();
-
-    double start = TMath::Log10(axis->GetXmin());
-    double stop = TMath::Log10(axis->GetXmax());
-    double range = stop - start;
-    int nbins = axis->GetNbins();
-    double binwidth = range / nbins;
-
-    double *bins = new double[nbins+1];
-    FOR(i, (nbins+1)) {
-	bins[i] = TMath::Power(10, start + i*binwidth);
-    }
-
-    axis->Set(nbins, bins);
-
-    delete[] bins;
-}
-
-
-void attachFiles(TChain* tree, const char* fname, int batchNo, int Nruns) {
-    if (!strcmp(fname, "")) { // no input given
-        cout<<"Will add production files from batch "
-            <<batchNo<<" to the chain (unchecked)."<<endl;
-        TString batch = Form("200%02d", batchNo);
-        TString topdir = "data/full_geom_v0_4classes/batch_";
-        topdir += batch + "00/";
-        for (int j = 0; j<Nruns; j++) {
-            TString fname = topdir +
-                Form(batch + "%02d/sim.root", j);
-            int status = tree->Add(fname, -1);
-        }
-    } else { // input given
-        cout<<"Adding "<<fname<<" to the chain."<<endl;
-        int status = tree->Add(fname, -1);
-        if (!status) { // try to look in the base dir
-            tree->SetName("anatree");
-            status = tree->Add(fname, -1);
-        }
-        cout<<"Status: "<<status<<endl;
-    }
-}
+// void attachFiles(TChain* tree, const char* fname, int batchNo, int Nruns) {
+//     if (!strcmp(fname, "")) { // no input given
+//         cout<<"Will add production files from batch "
+//             <<batchNo<<" to the chain (unchecked)."<<endl;
+//         TString batch = Form("200%02d", batchNo);
+//         TString topdir = "data/full_geom_v0_4classes/batch_";
+//         topdir += batch + "00/";
+//         for (int j = 0; j<Nruns; j++) {
+//             TString fname = topdir +
+//                 Form(batch + "%02d/sim.root", j);
+//             int status = tree->Add(fname, -1);
+//         }
+//     } else { // input given
+//         cout<<"Adding "<<fname<<" to the chain."<<endl;
+//         int status = tree->Add(fname, -1);
+//         if (!status) { // try to look in the base dir
+//             tree->SetName("anatree");
+//             status = tree->Add(fname, -1);
+//         }
+//         cout<<"Status: "<<status<<endl;
+//     }
+// }

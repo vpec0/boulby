@@ -1,3 +1,5 @@
+#include <numeric>
+
 #include "SD.hh"
 #include "G4HCofThisEvent.hh"
 #include "G4Step.hh"
@@ -98,9 +100,9 @@ G4bool SD::ProcessHits(G4Step* aStep,
 #ifdef DEBUG
 
   if (fDetector == AnaManager::kTpc && (pdg/10000) == 100054) { // print out only Xe depositions
-      G4cout<<"Created hit from pdg="<<pdg
+      G4cout<<"TPC, Xe, Created hit from pdg="<<pdg
 	    <<" edep="<<edep
-	    <<" time="<<aStep->GetPostStepPoint()->GetGlobalTime()
+	    <<" time="<<aStep->GetPostStepPoint()->GetGlobalTime()<<" ns"
 	    <<G4endl;
   }
 
@@ -144,10 +146,12 @@ void SD::EndOfEvent(G4HCofThisEvent*)
 	for ( G4int i=0; i<nofHits; i++ ) (*fHitsCollection)[i]->Print();
     }
 
+    if ( !fHitsCollection->GetSize() )
+	return;
+
     std::vector<G4double> edeps[kNDepositionClasses];
 
     std::vector<G4double> times;
-
 
     // FIXME: the following code relies on the hits being sorted by deposition times! Which is not true!
     // first need to get sort table for the collection
@@ -168,11 +172,11 @@ void SD::EndOfEvent(G4HCofThisEvent*)
     int size = sorted.size();
 
     if (fDetector == AnaManager::kTpc) {
-	G4cout<<"N hits in the collection: "<<size<<G4endl
-	      <<"First 20 hit times and their sort order: "<<G4endl;
+	G4cout<<"TPC: N hits in the collection: "<<size<<G4endl
+	      <<"  First 20 hit times and their sort order: "<<G4endl;
 	if (size > 20) size = 20;
 	for (std::size_t i = 0; i< size; ++i) {
-	    G4cout<<(*fHitsCollection)[i]->GetTime()<<": "<<sorted[i]<<G4endl;
+	    G4cout<<"    "<<(*fHitsCollection)[i]->GetTime()<<" ns: "<<sorted[i]<<G4endl;
 	}
 
 	G4cout<<"Will print "<<debugcounter
@@ -224,7 +228,7 @@ void SD::EndOfEvent(G4HCofThisEvent*)
 	    debugcounter > 0 &&
 	    pdg/10000 == 100054)
 	    {
-		G4cout<<"Adding hit "<<pdg<<", "<<edep<<", "<<time
+		G4cout<<"  Adding hit "<<pdg<<", "<<edep<<", "<<time
 		      <<" ns to window "
 		      <<(gate - gateWindow)<<" to "<<gate<<G4endl;
 
@@ -258,7 +262,7 @@ void SD::EndOfEvent(G4HCofThisEvent*)
     //     G4cout<<" Energy deposited in detector "<<fDetector<<G4endl
     // 	       <<"  EM: "<<total_em<<G4endl
     // 	       <<"  nonEM: "<<total_non_em<<G4endl;
-    for (int i = 0; i < times.size(); ++i) {
+    for (size_t i = 0; i < times.size(); ++i) {
 	if (i == AnaTree::MAX_DEPOSITIONS) break;
 	fAnaM->SetEdep(times[i], edeps[0][i], edeps[1][i], edeps[2][i], edeps[3][i], fDetector);
     }
