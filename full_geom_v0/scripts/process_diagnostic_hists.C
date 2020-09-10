@@ -5,13 +5,13 @@
 #define FOR(i, size) for (unsigned int i = 0; i < size; ++i)
 typedef const char* STR;
 
-int attachFiles(TChain* tree, const char* fname, int batchNo, int Nruns,
-		 const char* basedir = "data/full_geom_v0_4classes");
+// int attachFiles(TChain* tree, const char* fname, int batchNo, int Nruns,
+// 		 const char* basedir = "data/full_geom_v0_4classes");
 
 #include "common.icc"
 
 
-void process_diagnostic_hists(STR fname, STR outpref, int batchNo = 2002000, int Nruns = 10,
+void process_diagnostic_hists(STR fname, STR outpref, int batchNo = 4, int Nruns = 10,
 			      const char* basedir = "data/full_geom_v0_4classes")
 {
     // input tree
@@ -29,16 +29,6 @@ void process_diagnostic_hists(STR fname, STR outpref, int batchNo = 2002000, int
     	"n_skin",
     	"n_gdls",
     	"n_wt",
-    	"Edep_tpc",
-    	"Edep_rfr",
-    	"Edep_skin",
-    	"Edep_gdls",
-    	"Edep_wt",
-    	"Tdep_tpc",
-    	"Tdep_rfr",
-    	"Tdep_skin",
-    	"Tdep_gdls",
-    	"Tdep_wt",
     };
     tree->SetBranchStatus("*", 0);
     for (auto allow: allowed)
@@ -56,59 +46,21 @@ void process_diagnostic_hists(STR fname, STR outpref, int batchNo = 2002000, int
 	Nskin,
 	Ngdls,
 	Nwt,
-	Tdep_tpc,
-	Tdep_rfr,
-	Tdep_skin,
-	Tdep_gdls,
-	Tdep_wt,
 	Nhists,
     };
     TH1* hists[Nhists] = {};
-    TH1* hists_byClass[Nhists][kNDepositionClasses] = {};
 
-    const char* names[] = {"TPC", "RFR", "Skin", "GdLS", "WT",
-			   "Tdep_TPC", "Tdep_RFR", "Tdep_Skin", "Tdep_GdLS", "Tdep_WT"
-    };
+    const char* names[] = {"TPC", "RFR", "Skin", "GdLS", "WT"};
 
 
 #define H1(name) hists[name] = new TH1D(#name, Form("Number of energy deposits in %s clustered in 100 ns" \
-						    "; Number of deposits", names[name]), 260, 0, 260) \
+						    "; Number of deposits", names[name]), 100, 0, 100);	\
 
     H1(Ntpc);
     H1(Nrfr);
     H1(Nskin);
     H1(Ngdls);
     H1(Nwt);
-#undef H1
-
-#define H1(name) hists[name] = new TH1D(#name, Form("Times of energy depositions in %s clustered in 100 ns" \
-						    "; Time [#mus]", names[name-Tdep_tpc]), 200, 0.01, 1e8); \
-    doXlog(hists[name])							\
-
-    H1(Tdep_tpc);
-    H1(Tdep_rfr);
-    H1(Tdep_skin);
-    H1(Tdep_gdls);
-    H1(Tdep_wt);
-#undef H1
-
-    // Tdeps by deposition type
-#define H1(depclass, name) hists_byClass[name - Tdep_tpc][depclass] =		\
-	new TH1D(Form("%s_%s", #name, DepositionClassNames[depclass]),	\
-		 Form("Times of energy depositions by %s in %s clustered in 100 ns" \
-		      "; Time [#mus]", DepositionClassNames[depclass],	\
-		      names[name-Tdep_tpc]), 200, 0.01, 1e8);		\
-    doXlog(hists_byClass[name - Tdep_tpc][depclass])			\
-
-    FOR(i, kNDepositionClasses) {
-	H1(i, Tdep_tpc);
-	H1(i, Tdep_rfr);
-	H1(i, Tdep_skin);
-	H1(i, Tdep_gdls);
-	H1(i, Tdep_wt);
-    }
-#undef H1
-
 
     //**************************************************************************
 
@@ -134,18 +86,8 @@ void process_diagnostic_hists(STR fname, STR outpref, int batchNo = 2002000, int
 	}
 
 
-	for (int i = Ntpc; i < Tdep_tpc; i++) {
-	    size_t n = (&evt->n_tpc)[i];
-	    hists[i]->Fill( n );
-	    Double_t* tdeps = (&evt->Tdep_tpc)[i];
-	    Double_t* edeps = (Double_t*)(&evt->Edep_tpc)[i];
-	    for (int j = 0; j < n; ++j) {
-		hists[i + Tdep_tpc]->Fill(tdeps[j]);
-		for (int k = 0; k < kNDepositionClasses; ++k) {
-		    if (edeps[j*kNDepositionClasses + k] > 0.)
-			hists_byClass[i][k]->Fill(tdeps[j]);
-		}
-	    }
+	for (int i = Ntpc; i < Nhists; i++) {
+	    hists[i]->Fill( (&evt->n_tpc)[i] );
 	}
 	++ientry;
     }
@@ -155,12 +97,6 @@ void process_diagnostic_hists(STR fname, STR outpref, int batchNo = 2002000, int
     FOR (i, Nhists) {
 	auto h = hists[i];
 	h->Write(h->GetName(), TObject::kOverwrite);
-    }
-    FOR (i, Nhists-Tdep_tpc) {
-	FOR (j, kNDepositionClasses) {
-	    auto h = hists_byClass[i][j];
-	    h->Write(h->GetName(), TObject::kOverwrite);
-	}
     }
 
     cout<<"Saving histograms in "<<outf->GetName()<<endl;
