@@ -5,8 +5,8 @@
 #define FOR(i, size) for (unsigned int i = 0; i < size; ++i)
 typedef const char* STR;
 
-int attachFiles(TChain* tree, const char* fname, int batchNo, int Nruns,
-		 const char* basedir = "data/full_geom_v0_4classes");
+// int attachFiles(TChain* tree, const char* fname, int batchNo, int Nruns,
+// 		 const char* basedir = "data/full_geom_v0_4classes");
 
 #include "common.icc"
 
@@ -16,7 +16,7 @@ void process_diagnostic_hists(STR fname, STR outpref, int batchNo = 4, int Nruns
 {
     // input tree
     auto tree = new TChain("events");
-    size_t size = attachFiles(tree, fname, batchNo, Nruns, basedir);
+    size_t size = attachFiles(tree, fname, batchNo, Nruns, 0, basedir);
     auto evt = new AnaTree::Event_t;
     AnaTree::resetEvent(*evt);
     AnaTree::registerTree(tree, *evt);
