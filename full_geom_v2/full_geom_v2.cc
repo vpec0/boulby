@@ -24,8 +24,8 @@
 // ********************************************************************
 //
 //
-/// \file example.cc
-/// \brief Main program of the  example
+/// \file full_geom_v2.cc
+/// \brief Main program of the Boulby FS full geometry, LAr
 
 #include "DetectorConstruction.hh"
 #include "ActionInitialization.hh"

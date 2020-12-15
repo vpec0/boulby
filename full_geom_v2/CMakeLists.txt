@@ -1,7 +1,7 @@
 #----------------------------------------------------------------------------
 # Setup the project
 cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
-project(full_geom_v1)
+project(full_geom_v2)
 
 #----------------------------------------------------------------------------
 # Find Geant4 package, activating all available UI and Vis drivers by default
@@ -56,23 +56,23 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
 #
-add_executable(full_geom_v1 full_geom_v1.cc ${sources} ${headers})
-target_link_libraries(full_geom_v1 ${Geant4_LIBRARIES})
-target_link_libraries(full_geom_v1 ${ROOT_LIBRARIES})
+add_executable(full_geom_v2 full_geom_v2.cc ${sources} ${headers})
+target_link_libraries(full_geom_v2 ${Geant4_LIBRARIES})
+target_link_libraries(full_geom_v2 ${ROOT_LIBRARIES})
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we
 # build B1. This is so that we can run the executable directly because it
 # relies on these scripts being in the current working directory.
 #
-set(FULL_GEOM_V1_SCRIPTS
+set(FULL_GEOM_v2_SCRIPTS
   init_vis.mac
   run1.mac
   run2.mac
   runTest.mac
   )
 
-foreach(_script ${FULL_GEOM_V1_SCRIPTS})
+foreach(_script ${FULL_GEOM_v2_SCRIPTS})
   configure_file(
     ${PROJECT_SOURCE_DIR}/${_script}
     ${PROJECT_BINARY_DIR}/${_script}
@@ -94,9 +94,9 @@ endforeach()
 # For internal Geant4 use - but has no effect if you build this
 # example standalone
 #
-#add_custom_target(full_geom_v1 DEPENDS full_geom_v1)
+#add_custom_target(full_geom_v2 DEPENDS full_geom_v2)
 
 #----------------------------------------------------------------------------
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
 #
-install(TARGETS full_geom_v1 DESTINATION bin)
+install(TARGETS full_geom_v2 DESTINATION bin)
