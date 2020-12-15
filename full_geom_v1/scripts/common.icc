@@ -37,7 +37,10 @@ int attachFiles(TChain* tree, const char* fname, int batchNo, int Nruns, int sta
     return size;
 }
 
-
+#ifndef FOR
+#define FOR(i, size) for (int i = 0; i < size; i++)
+#define UNDEFFOR
+#endif
 void doXlog(TH1* h, int which = 0)
 // redo scales for x-log hists
 {
@@ -58,3 +61,8 @@ void doXlog(TH1* h, int which = 0)
 
     delete[] bins;
 }
+
+#ifdef UNDEFFOR
+#undef FOR
+#undef UNDEFFOR
+#endif

@@ -52,7 +52,7 @@ namespace AnaTree {
     INT(n_skin);				\
     INT(n_gdls);				\
     INT(n_wt);					\
-						\
+    /* Tdep is deposition time in us */		\
     DOUBLE_ARR(Tdep_tpc, n_tpc);		\
     DOUBLE_ARR(Tdep_rfr, n_rfr);		\
     DOUBLE_ARR(Tdep_skin, n_skin);		\

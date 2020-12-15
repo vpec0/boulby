@@ -20,6 +20,6 @@ for BATCH in $RANGE ; do
     OUTPREF=$OUTDIR/batch_${BATCH}_
     LOGFILE=logs/process_diagnostics_v1${TYPE}${SUFFIX}_${BATCH}.log
 
-    root -l -b -q "scripts_full_geom_v1/process_diagnostic_hists.C(\"\",\"$OUTPREF\", $BATCH, 100, \"$BASEDIR\")" \
+    nice root -l -b -q "scripts_full_geom_v1/process_diagnostic_hists.C(\"\",\"$OUTPREF\", $BATCH, 100, \"$BASEDIR\")" \
 	&> $LOGFILE&
 done
