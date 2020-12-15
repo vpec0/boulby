@@ -38,5 +38,5 @@
 ############################################################
 #
 # /vis/ogl/set/printMode pixmap
-/vis/ogl/set/printFilename plots/full_geom_v0_full_view.svg
+/vis/ogl/set/printFilename plots/full_geom_v2_full_view.svg
 /vis/ogl/export

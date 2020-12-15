@@ -25,6 +25,7 @@
 
 // Change Log:
 //
+// 15/12/2020 - Change to larger TPC volume with LAr
 // 24/05/2020 - start changing to cylindrical geometry
 //
 //
@@ -56,9 +57,9 @@ namespace Geometry {
     /// Defined properties
 
     // Active region
-    const G4String  TPC_MATERIAL = "LXe";
-    const double TPC_H = 2.5 * m; // height
-    const double TPC_D = 3.5 * m; // diameter
+    const G4String  TPC_MATERIAL = "LAr";
+    const double TPC_H = 5 * m; // height
+    const double TPC_D = 6 * m; // diameter
     // position - active volume centered
     // making this to be calculated from the distance of WT from the wall //const double TPC_X = 0.;
     const double WT_FROM_WALL_OFFSET = 5*m;
@@ -116,9 +117,9 @@ namespace Geometry {
 
     // Water tank
     const G4String  WT_MATERIAL = "Water";
-    const double WT_THICKNESS_TOP = 3.5*m;
-    const double WT_THICKNESS_BOTTOM = 1.5*m;
-    const double WT_THICKNESS_SIDE = 3.5*m;//4*m;
+    const double WT_THICKNESS_TOP = 2.*m;
+    const double WT_THICKNESS_BOTTOM = 1.*m;
+    const double WT_THICKNESS_SIDE = 2.25*m;//4*m;
 
     // Bottom steel shielding
     const G4String  STEEL_MATERIAL = "Steel";
@@ -335,6 +336,7 @@ namespace Geometry {
 	{"Steel", "G4_STAINLESS-STEEL"},
 	{"PE", "G4_POLYETHYLENE"},
 	{"Xe_External", "Xe_External"},
+	{"LAr", "G4_lAr"},
     };
 
 
