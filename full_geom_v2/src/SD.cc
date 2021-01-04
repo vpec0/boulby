@@ -99,7 +99,7 @@ G4bool SD::ProcessHits(G4Step* aStep,
 
 #ifdef DEBUG
 
-  if (fDetector == AnaManager::kTpc && (pdg/10000) == 100054) { // print out only Xe depositions
+  if (fDetector == AnaManager::kTpc && (pdg/10000) == 100018) { // print out only Xe depositions
       G4cout<<"TPC, Xe, Created hit from pdg="<<pdg
 	    <<" edep="<<edep
 	    <<" time="<<aStep->GetPostStepPoint()->GetGlobalTime()<<" ns"
@@ -216,7 +216,7 @@ void SD::EndOfEvent(G4HCofThisEvent*)
 	    depcls = kEm;
 	else if (pdg == -13 || pdg == 13)
 	    depcls = kMu;
-	else if (pdg > 1000540000 && pdg < 1000550000)
+	else if (pdg > 1000180000 && pdg < 1000190000)
 	    depcls = kXe;
 	else
 	    depcls = kOther;
@@ -226,7 +226,7 @@ void SD::EndOfEvent(G4HCofThisEvent*)
 
 	if (fDetector == AnaManager::kTpc &&
 	    debugcounter > 0 &&
-	    pdg/10000 == 100054)
+	    pdg/10000 == 100018)
 	    {
 		G4cout<<"  Adding hit "<<pdg<<", "<<edep<<", "<<time
 		      <<" ns to window "
