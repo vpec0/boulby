@@ -1,16 +1,16 @@
 
 const char* base_dir[2] = {
-    "plots/full_geom",
-    "plots/full_geom_nacl"};
+    "plots/full_geom_v0_gsrock_4classes_sortbugfix",
+    "plots/full_geom_v0_nacl_4classes_sortbugfix"};
 
-const double scale[2] = { 1., 120e6/199902600.};
+const double scale[2] = { 1., 100e6/198.25e6};
 
 const size_t colors[2] = {kRed, kBlue};
 
 const char* titles[2] = {"GS rock", "NaCl"};
 
 
-const TString outpref("plots/compare_grr_nacl_");
+const TString outpref("plots/full_geom_v0_compare_GSrockNaCl/compare_gsrock_nacl_");
 
 struct HistInfo_t {
     double min;
@@ -48,7 +48,7 @@ void comparisonGSrockNaCl()
 		auto h = (TH1*)key->ReadObj();
 
 		HistInfo_t &hi =  hists[h->GetName()];
-		hi.min = 0; hi.max = 20.; hi.logX = false; hi.hists[i] = h;
+		hi.min = 0; hi.max = 100.; hi.logX = false; hi.hists[i] = h;
 
 		h->SetDirectory(gROOT); // keep histogram in memory after closing the input file
 	    }
@@ -139,12 +139,10 @@ void plotComparisons(HistMap_t& hists) {
 
 	h->SetAxisRange(hpair.second.min, hpair.second.max);
 	h->Draw();
-	h->GetYaxis()->SetTitle("Ratio GS rock/NaCl");
+	h->GetYaxis()->SetTitle(Form("%s/%s", titles[0], titles[1]));
 
 	// draw line at ratio=1.
-	//c->Update();
-	auto xaxis = h->GetXaxis();
-	TLine l(xaxis->GetXmin(), 1., xaxis->GetXmax(), 1.);
+	TLine l(hpair.second.min, 1., hpair.second.max, 1.);
 	l.SetLineColor(kGreen+1);
 	l.SetLineWidth(2);
 	l.Draw();
