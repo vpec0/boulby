@@ -48,10 +48,12 @@ void infoPrintouts(int, AnaTree::Event_t* , deposition_vector* , deposition_vect
 vector<int> getIsolatedDepositions(deposition_vector*);
 deposition_t testOtherDep(deposition_vector&, double, double, double, double);
 void printDepositions(deposition_vector& deps);
+void printDeposition(deposition_t& dep);
 
 
 void process_proper_coinc(const char* basedir = "data/full_geom_v0_4classes",
 			  int batchNo = 4, int Nruns = 10,
+			  const char* outfname = "",
 			  const char* LS = "LSon")
 {
 
@@ -62,9 +64,14 @@ void process_proper_coinc(const char* basedir = "data/full_geom_v0_4classes",
     AnaTree::resetEvent(*evt);
     AnaTree::registerTree(tree, *evt);
 
+    cout<<"Number of files attached to the chain: "<<tree->GetNtrees()<<endl;
+
 
     // output tree
-    auto outf = TFile::Open("test_proper_coincidence.root", "recreate");
+    TString oname = outfname;
+    if (oname == "")
+	oname = "test_proper_coincidence.root";
+    auto outf = TFile::Open(oname, "recreate");
     auto outtree = new TTree("proper_coincidence","");
     auto outevt = new ProperCoincTree::Event_t;
     ProperCoincTree::createBranches(outtree, outevt);
@@ -112,7 +119,7 @@ void process_proper_coinc(const char* basedir = "data/full_geom_v0_4classes",
 #ifdef DEBUG
     size = 20; // just for debugging
 #endif
-    size = 4000;
+    //size = 4000;
     size_t step = size / 50;
 
     cout << "Will process "<<size<<" entries."<<endl;
@@ -121,10 +128,10 @@ void process_proper_coinc(const char* basedir = "data/full_geom_v0_4classes",
     // loop over tree entries
     size_t ientry = 0;
     while ( tree->GetEntry(ientry) && ientry < size ) {
-	// if (step && (ientry+1) % step == 0 ) {
-	//     cout<<"-";
-	//     cout.flush();
-	// }
+	if (step && (ientry+1) % step == 0 ) {
+	    cout<<"-";
+	    cout.flush();
+	}
 
 
 	// group depositions in all detectors (by deposition class in TPC, sum everywhere else
@@ -143,25 +150,25 @@ void process_proper_coinc(const char* basedir = "data/full_geom_v0_4classes",
 	    vector<int> i_tpc = getIsolatedDepositions(tpc_deps);
 
 	    if (i_tpc.size() ) {
-		infoPrintouts(ientry, evt, tpc_deps, skin_deps, gdls_deps, wt_deps);
+		//infoPrintouts(ientry, evt, tpc_deps, skin_deps, gdls_deps, wt_deps);
 
-		cout<<"Isolate TPC Xe depositions:  "<< i_tpc.size()<<endl;
-		cout<<"     "<<"       T0       T1       Xe       Em       Mu    Other"<<endl;
-		for (auto idep: i_tpc) {
-		    printf("%4d:",idep);
-		    printf("%9.3f",tpc_deps[0][idep].T1);
-		    printf("%9.3f",tpc_deps[0][idep].T2);
-		    for(int i = 0; i < 4; i++) {
-			printf("%9.3f", tpc_deps[i][idep].E);
-		    }
-		    cout<<endl;
-		}
-		cout<<endl;
+		// cout<<"Isolate TPC Xe depositions:  "<< i_tpc.size()<<endl;
+		// cout<<"     "<<"       T0       T1       Xe       Em       Mu    Other"<<endl;
+		// for (auto idep: i_tpc) {
+		//     printf("%4d:",idep);
+		//     printf("%9.3f",tpc_deps[0][idep].T1);
+		//     printf("%9.3f",tpc_deps[0][idep].T2);
+		//     for(int i = 0; i < 4; i++) {
+		// 	printf("%9.3f", tpc_deps[i][idep].E);
+		//     }
+		//     cout<<endl;
+		// }
+		// cout<<endl;
 
 
 		// check if signal in other parts
-		double before = 100.; // veto window before signal; us
-		double after = 100.; // veto window after signal
+		const double before = 100.; // veto window before signal; us
+		const double after = 100.; // veto window after signal
 
 		for ( auto idep : i_tpc) {
 		    auto tpc_dep = tpc_deps[0][idep];
@@ -189,10 +196,10 @@ void process_proper_coinc(const char* basedir = "data/full_geom_v0_4classes",
 		    outevt->veto_t2[1] = depGdls.T2;
 		    outevt->veto_t2[2] = depWt.T2;
 
-		    // cout<<idep<<" Depositions in other detectors:"<<endl;
-		    // cout<<"  Skin: "<<depSkin.E<<endl;
-		    // cout<<"  Gdls: "<<depGdls.E<<endl;
-		    // cout<<"  Wt: "<<depWt.E<<endl;
+		    // cout<<idep<<": Depositions in other detectors:"<<endl;
+		    // cout<<"  Skin: "; printDeposition(depSkin);
+		    // cout<<"  Gdls: "; printDeposition(depGdls);
+		    // cout<<"  Wt: "; printDeposition(depWt);
 
 		    // if (EdepSkin < skin_veto || EdepGdls < gdls_veto || EdepWt < wt_veto) {
 		    // 	cout<<"Single deposition in tpc: ";
@@ -298,8 +305,9 @@ void infoPrintouts(int ientry,
 		   deposition_vector& wt_deps)
 {
     //if (evt->n_tpc < 2 ) return;
-
-    cout<<"Event "<<ientry<<" deposition counts:"<<endl
+    cout<<endl;
+    cout<<"===> Run: "<<evt->runNo<<" Event "<<evt->eventNo<<" Entry: "<<ientry<<" <==="<<endl
+	<<"deposition counts:"<<endl
 	<<"  TPC: "<<tpc_deps[0].size()<<endl
 	<<"  Skin: "<<skin_deps.size()<<endl
 	<<"  GdLS: "<<gdls_deps.size()<<endl
@@ -332,12 +340,14 @@ void infoPrintouts(int ientry,
 
 vector<int> getIsolatedDepositions(deposition_vector* deps)
 {
+    const double IsolationCut = 10.; // micro seconds
+
     vector<int> result;
 
     int isolated = 1;
     int xe_only = 1;
     for (int i = 1; i < deps[0].size(); i++) {
-	if ( deps[0][i].T1 - deps[0][i-1].T2 > 10. ) {
+	if ( deps[0][i].T1 - deps[0][i-1].T2 > IsolationCut ) {
 	    // isolated from next deposition
 	    if (isolated) {
 		// isolated from previous deposition
@@ -378,8 +388,13 @@ deposition_t testOtherDep(deposition_vector& deps, double t1, double t2, double 
 }
 
 
+void printDeposition(deposition_t& dep)
+{
+    cout<<"  "<<dep.T1<<".."<<dep.T2<<": "<<dep.E<<endl;
+}
+
 void printDepositions(deposition_vector& deps)
 {
     for (auto dep: deps)
-	cout<<"  "<<dep.T1<<".."<<dep.T2<<": "<<dep.E<<endl;
+	printDeposition(dep);
 }
