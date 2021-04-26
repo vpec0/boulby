@@ -9,7 +9,7 @@ typedef const char* STR;
 
 //#define DEBUG
 
-void print_bkgevents(STR fname, STR outpref, int batchNo = 2002000, int Nruns = 10, int startrun = 0,
+void print_bkgevents(STR fname, int batchNo = 2002000, int Nruns = 10, int startrun = 0,
 		     const char* LS = "LSon",
 		     const char* basedir = "data/full_geom_v0_nacl_4classes")
 {
@@ -97,11 +97,17 @@ void print_bkgevents(STR fname, STR outpref, int batchNo = 2002000, int Nruns = 
     vector<int> event_full;
     vector<float> edep_full;
     vector<float> tdep_full;
+    vector<float> edep_skin_full;
+    vector<float> edep_gdls_full;
+    vector<float> edep_wt_full;
 
     vector<int> run_nogdls;
     vector<int> event_nogdls;
     vector<float> edep_nogdls;
     vector<float> tdep_nogdls;
+    vector<float> edep_skin_nogdls;
+    vector<float> edep_gdls_nogdls;
+    vector<float> edep_wt_nogdls;
 
 
     // output file
@@ -157,20 +163,25 @@ void print_bkgevents(STR fname, STR outpref, int batchNo = 2002000, int Nruns = 
 	    //no other depositions
 	    if (etot_class[EdepTpc][kXe] > 0.) {
 		if (etot[EdepSkin] < skin_veto) {
-		    if (etot[EdepGdls] < gdls_veto) {
-			if (etot[EdepWt] < wt_veto) {
+		    if (etot[EdepWt] < wt_veto) {
+			if (etot[EdepGdls] < gdls_veto) {
 			    // full veto
 			    run_full.push_back(evt->runNo);
 			    event_full.push_back(evt->eventNo);
 			    edep_full.push_back(etot_class[EdepTpc][kXe]);
 			    tdep_full.push_back(tdepfirst[EdepTpc]);
+			    edep_skin_full.push_back(etot[EdepSkin]);
+			    edep_gdls_full.push_back(etot[EdepGdls]);
+			    edep_wt_full.push_back(etot[EdepWt]);
+			} else {
+			    run_nogdls.push_back(evt->runNo);
+			    event_nogdls.push_back(evt->eventNo);
+			    edep_nogdls.push_back(etot_class[EdepTpc][kXe]);
+			    tdep_nogdls.push_back(tdepfirst[EdepTpc]);
+			    edep_skin_nogdls.push_back(etot[EdepSkin]);
+			    edep_gdls_nogdls.push_back(etot[EdepGdls]);
+			    edep_wt_nogdls.push_back(etot[EdepWt]);
 			}
-		    }
-		    if (etot[EdepWt] < wt_veto) {
-			run_nogdls.push_back(evt->runNo);
-			event_nogdls.push_back(evt->eventNo);
-			edep_nogdls.push_back(etot_class[EdepTpc][kXe]);
-			tdep_nogdls.push_back(tdepfirst[EdepTpc]);
 		    }
 		}
 	    }
@@ -184,30 +195,42 @@ void print_bkgevents(STR fname, STR outpref, int batchNo = 2002000, int Nruns = 
     cout<<"Processed "<<ientry<<" entries"<<endl;
 
 
-    cout<<"Skin+GdLS+WT:"<<endl
-	<<"============="<<endl;
+    cout<<"Run Event E_TPC_Xe [MeV] TPC_T [us] E_Skin E_LS E_WT"<<endl;
+
+    cout<<"Full veto:"<<endl;
     auto run = run_full.begin();
     auto event = event_full.begin();
     auto edep = edep_full.begin();
     auto tdep = tdep_full.begin();
-    for (;run != run_full.end(); run++, event++, edep++, tdep++) {
-	cout<< *run <<"/"<< *event <<": "
-	    <<"EdepXeonly = "<< *edep << " MeV"
-	    <<" at "<< *tdep
+    auto skin = edep_skin_full.begin();
+    auto gdls = edep_gdls_full.begin();
+    auto wt = edep_wt_full.begin();
+    for (;run != run_full.end(); run++, event++, edep++, tdep++, skin++, gdls++, wt++) {
+	cout<< *run <<" "<< *event
+	    <<" "<< *edep
+	    <<" "<< *tdep
+	    <<" "<< *skin
+	    <<" "<< *gdls
+	    <<" "<< *wt
 	    <<endl;
     }
 
 
-    cout<<"Skin+WT:"<<endl
-	<<"============="<<endl;
+    cout<<"No LS veto:"<<endl;
     run = run_nogdls.begin();
     event = event_nogdls.begin();
     edep = edep_nogdls.begin();
     tdep = tdep_nogdls.begin();
-    for (;run != run_nogdls.end(); run++, event++, edep++, tdep++) {
-	cout<< *run <<"/"<< *event <<": "
-	    <<"EdepXeonly = "<< *edep << " MeV"
-	    <<" at "<< *tdep
+    skin = edep_skin_nogdls.begin();
+    gdls = edep_gdls_nogdls.begin();
+    wt = edep_wt_nogdls.begin();
+    for (;run != run_nogdls.end(); run++, event++, edep++, tdep++, skin++, gdls++, wt++) {
+	cout<< *run <<" "<< *event
+	    <<" "<< *edep
+	    <<" "<< *tdep
+	    <<" "<< *skin
+	    <<" "<< *gdls
+	    <<" "<< *wt
 	    <<endl;
     }
 }

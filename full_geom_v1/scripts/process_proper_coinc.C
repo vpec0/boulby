@@ -53,8 +53,7 @@ void printDeposition(deposition_t& dep);
 
 void process_proper_coinc(const char* basedir = "data/full_geom_v0_4classes",
 			  int batchNo = 4, int Nruns = 10,
-			  const char* outfname = "",
-			  const char* LS = "LSon")
+			  const char* outfname = "")
 {
 
     // input tree
@@ -77,16 +76,16 @@ void process_proper_coinc(const char* basedir = "data/full_geom_v0_4classes",
     ProperCoincTree::createBranches(outtree, outevt);
     ProperCoincTree::Event_t empty_evt = {};
 
-    const double	skin_veto = 0.1;	// 100 keV
-    double gdls_veto		  = 0.2;	// 200 keV, default LS treated as LS
-    const double	wt_veto	  = 200.;	// 200 MeV
-    if (strstr("LSoff", LS))
-	gdls_veto = wt_veto;	// 200 MeV, treat LS as WT
+    // const double	skin_veto = 0.1;	// 100 keV
+    // double gdls_veto		  = 0.2;	// 200 keV, default LS treated as LS
+    // const double	wt_veto	  = 200.;	// 200 MeV
+    // if (strstr("LSoff", LS))
+    // 	gdls_veto = wt_veto;	// 200 MeV, treat LS as WT
 
-    cout<<"Using following threshold for veto detectors:"<<endl
-	<<"  Skin: "<<skin_veto<<endl
-	<<"  GdLS: "<<gdls_veto<<endl
-	<<"    WT: "<<wt_veto<<endl;
+    // cout<<"Using following threshold for veto detectors:"<<endl
+    // 	<<"  Skin: "<<skin_veto<<endl
+    // 	<<"  GdLS: "<<gdls_veto<<endl
+    // 	<<"    WT: "<<wt_veto<<endl;
 
 
 
@@ -118,8 +117,8 @@ void process_proper_coinc(const char* basedir = "data/full_geom_v0_4classes",
 
 #ifdef DEBUG
     size = 20; // just for debugging
+    size = 4000;
 #endif
-    //size = 4000;
     size_t step = size / 50;
 
     cout << "Will process "<<size<<" entries."<<endl;
@@ -149,22 +148,26 @@ void process_proper_coinc(const char* basedir = "data/full_geom_v0_4classes",
 	if (tpc_deps[0].size()) {
 	    vector<int> i_tpc = getIsolatedDepositions(tpc_deps);
 
+#ifdef DEBUG
+	    tree->Show(-1, 40);
+#endif
+
 	    if (i_tpc.size() ) {
-		//infoPrintouts(ientry, evt, tpc_deps, skin_deps, gdls_deps, wt_deps);
-
-		// cout<<"Isolate TPC Xe depositions:  "<< i_tpc.size()<<endl;
-		// cout<<"     "<<"       T0       T1       Xe       Em       Mu    Other"<<endl;
-		// for (auto idep: i_tpc) {
-		//     printf("%4d:",idep);
-		//     printf("%9.3f",tpc_deps[0][idep].T1);
-		//     printf("%9.3f",tpc_deps[0][idep].T2);
-		//     for(int i = 0; i < 4; i++) {
-		// 	printf("%9.3f", tpc_deps[i][idep].E);
-		//     }
-		//     cout<<endl;
-		// }
-		// cout<<endl;
-
+#ifdef DEBUG
+		infoPrintouts(ientry, evt, tpc_deps, skin_deps, gdls_deps, wt_deps);
+		cout<<"Isolate TPC Xe depositions:  "<< i_tpc.size()<<endl;
+		cout<<"     "<<"       T0       T1       Xe       Em       Mu    Other"<<endl;
+		for (auto idep: i_tpc) {
+		    printf("%4d:",idep);
+		    printf("%9.3f",tpc_deps[0][idep].T1);
+		    printf("%9.3f",tpc_deps[0][idep].T2);
+		    for(int i = 0; i < 4; i++) {
+			printf("%9.3f", tpc_deps[i][idep].E);
+		    }
+		    cout<<endl;
+		}
+		cout<<endl;
+#endif
 
 		// check if signal in other parts
 		const double before = 100.; // veto window before signal; us
@@ -196,10 +199,12 @@ void process_proper_coinc(const char* basedir = "data/full_geom_v0_4classes",
 		    outevt->veto_t2[1] = depGdls.T2;
 		    outevt->veto_t2[2] = depWt.T2;
 
-		    // cout<<idep<<": Depositions in other detectors:"<<endl;
-		    // cout<<"  Skin: "; printDeposition(depSkin);
-		    // cout<<"  Gdls: "; printDeposition(depGdls);
-		    // cout<<"  Wt: "; printDeposition(depWt);
+#ifdef DEBUG
+		    cout<<idep<<": Depositions in other detectors:"<<endl;
+		    cout<<"  Skin: "; printDeposition(depSkin);
+		    cout<<"  Gdls: "; printDeposition(depGdls);
+		    cout<<"  Wt: "; printDeposition(depWt);
+#endif
 
 		    // if (EdepSkin < skin_veto || EdepGdls < gdls_veto || EdepWt < wt_veto) {
 		    // 	cout<<"Single deposition in tpc: ";
