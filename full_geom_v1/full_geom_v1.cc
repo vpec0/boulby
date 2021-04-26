@@ -64,9 +64,12 @@ int main(int argc,char** argv)
   std::cout<<">>> simple_geom: begin."<<std::endl;
   // Detect interactive mode (if no arguments) and define UI session
   //
+  bool doVis = false;
   G4UIExecutive* ui = 0;
   if ( argc == 1 ) {
-      ui = new G4UIExecutive(argc, argv, "tcsh");
+      //doVis = true;
+      ui = new G4UIExecutive(argc, argv);
+      // std::cout<<"### Opening UI "<<std::endl;
   }
 
   if (argc == 2) { //
@@ -146,7 +149,9 @@ int main(int argc,char** argv)
   // G4VisManager* visManager = new G4VisExecutive;
   // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
   if (ui) { // this is an interactive mode, allow visualisation
-      G4VisManager* visManager = new G4VisExecutive("Quiet");
+  //if (doVis) { // this is an interactive mode, allow visualisation
+      G4cout<<"### Creating vis manager"<<G4endl;
+      G4VisManager* visManager = new G4VisExecutive();
       visManager->Initialize();
   }
 
@@ -156,6 +161,7 @@ int main(int argc,char** argv)
   // Process macro or start UI session
   //
   if ( ! ui ) {
+      //if ( ! doVis ) {
     // batch mode
     G4String command = "/control/execute ";
     G4String fileName = argv[1];
@@ -163,8 +169,9 @@ int main(int argc,char** argv)
   }
   else {
     // interactive mode
+    G4cout<<"### About to execute init_vis.mac"<<G4endl;
     UImanager->ApplyCommand("/control/execute init_vis.mac");
-    // ui->SessionStart();
+    ui->SessionStart();
     delete ui;
   }
 

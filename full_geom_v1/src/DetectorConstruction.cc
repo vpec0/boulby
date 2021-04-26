@@ -695,7 +695,7 @@ void DetectorConstruction::PrepareMaterials(G4NistManager* nist)
 
     // define polyhalite
     auto polyhalite = new G4Material("polyhalite",2.78*g/cm3, 6, kStateSolid );
-    // K2Ca2Mg(SO4)4·2H2O
+    // K2Ca2Mg(SO4)4x2H2O
     // Counts of element atoms:
     //   - K   2x
     //   - Ca  2x
