@@ -1,0 +1,47 @@
+Energy			= 280
+NEvents			= 10000
+RunNo			= ( 20600 + $(Process) )
+Material		= polyethylene_standard
+executable		= full_geom_v0.sh
+arguments		= $(Charge) $(Energy) $(Material) $INT(RunNo) $(NEvents)
+LogDir			= logs/$(Material)/$(Charge)/$(Energy)
+log			= $(LogDir)/full_geom_v0_$(Charge)_$(Energy)_GeV_$INT(RunNo).log
+#Output			= $(LogDir)/sim_$INT(RunNo).out
+#Error			= $(LogDir)/sim_$INT(RunNo).err
+
+
+#should_transfer_files	= YES
+#Initialdir		= ../data/$(Material)/$(Charge)/$(Energy)/$INT(RunNo)
+#when_to_transfer_output = ON_EXIT_OR_EVICT
+
+#DataDir			= ../data/$(Material)/$(Charge)/$(Energy)/$INT(RunNo)
+#transfer_output_remaps	= "$(Output)=$(DataDir)/$(Output);$(Error)=$(DataDir)/$(Error);sim.root=$(DataDir)/sim.root"
+#transfer_output_remaps	= "sim.root=$(DataDir)/sim.root"
+
+
+
+NCharges 		= 2
+NEnergies 		= 4
+NPerItem		= 10
+N 	  		= $(NCharges) * $(NEnergies) * $(NPerItem)
+ChOption    		= $(Process) / ($(NEnergies) * $(NPerItem))
+EnOption		= ($(Process) / $(NPerItem)) % $(NEnergies) 
+
+Charge			= $CHOICE(ChOption, muminus, muplus)
+Energy			= $CHOICE(EnOption, 30, 100, 280, 1000) 
+
+queue $(N)
+
+# Energy	= 1000
+# queue 10  Charge in muminus muplus 
+
+
+# queue 10 Charge Energy from ( muminus 240
+#       Muminus 280
+#       muminus 320
+#       muplus 240
+#       muplus 280
+#       muplus 320
+# )
+
+# queue 5 Charge in muplus

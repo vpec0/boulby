@@ -51,11 +51,14 @@
 
 int main(int argc,char** argv)
 /**
- * Input parameters:
+ * Input parameters (if macro given, then generator file needs to be supplied):
  *   1: string;  run macro file
- *   2: string;  output file
- *   3: integer; Start run
- *   4: string;  active material
+ *   2: string;  generator file
+ *   3: string;  output file
+ *   4: integer; Start run
+ *   5: integer; start event from which to read in from muon flux file
+ *   6: integer; number of events to read in from the flux file
+ *   7: integer; set an event offset to be able to start in the middle of the same run, for reproducibility
  **/
 {
   std::cout<<">>> simple_geom: begin."<<std::endl;
@@ -66,14 +69,24 @@ int main(int argc,char** argv)
       ui = new G4UIExecutive(argc, argv, "tcsh");
   }
 
-  std::cout<<">>> simple_geom: deal with random number settings..."<<std::endl;
+  if (argc == 2) { //
+      std::cerr<<"error, when macro file supplied, path to muon file needs to be provided too"<<std::endl;
+      return -1;
+  }
+
+  G4String muon_file_name = "";
+  if (argc > 2) {
+      muon_file_name = argv[2];
+  }
+
+  std::cout<<">>> full_geom_v0: deal with random number settings..."<<std::endl;
   // Choose the Random engine
   G4Random::setTheEngine(new CLHEP::RanecuEngine);
   G4Random::showEngineStatus();
   int startRun = 2000010;
-  if (argc>3)
-      sscanf(argv[3], "%d", &startRun);
-  std::cout<<">>> simple_geom: Will use "<<startRun<<" start number in run sequence."<<std::endl;
+  if (argc>4)
+      sscanf(argv[4], "%d", &startRun);
+  std::cout<<">>> full_geom_v0: Will use "<<startRun<<" start number in run sequence."<<std::endl;
 
 
   // Construct the default run manager
@@ -91,11 +104,7 @@ int main(int argc,char** argv)
 
   // Set mandatory initialization classes
   //
-  // Detector construction
-  G4String material = "polyethylene_standard";
-  if (argc > 4)
-      material = argv[4];
-  DetectorConstruction* detconst = new DetectorConstruction(material);
+  DetectorConstruction* detconst = new DetectorConstruction();
   runManager->SetUserInitialization(detconst);
 
   // Physics list
@@ -103,18 +112,34 @@ int main(int argc,char** argv)
   physicsList->SetVerboseLevel(1);
   runManager->SetUserInitialization(physicsList);
 
-  // TString outfname("");
-  // AnaManager* anam = 0;
-  // if (argc>2) {
-  //     outfname = argv[2];
-  //     anam = new AnaManager(outfname);
-  // } else
-  //     anam = new AnaManager();
+  TString outfname("");
+  AnaManager* anam = 0;
+  if (argc>3) {
+      outfname = argv[3];
+      anam = new AnaManager(outfname);
+  } else
+      anam = new AnaManager();
 
-  // anam->Book();
+  anam->Book();
 
   // User action initialization
-  //runManager->SetUserInitialization(new ActionInitialization(detconst, anam));
+  auto uai = new ActionInitialization(detconst, muon_file_name);
+  // set parameters for reading in from the muon flux file
+  G4int startEvent = 0;
+  if (argc > 5)
+      sscanf(argv[5], "%d", &startEvent);
+  uai->SetStartEvent(startEvent);
+  G4int nEvents = -1; // default read all
+  if (argc > 6)
+      sscanf(argv[6], "%d", &nEvents);
+  uai->SetNevents(nEvents);
+  G4int eventOffset = 0;
+  if (argc > 7)
+      sscanf(argv[7], "%d", &eventOffset);
+  uai->SetEventOffset(eventOffset);
+
+  runManager->SetUserInitialization(uai);
+
 
   // Initialize visualization
   //
@@ -139,7 +164,7 @@ int main(int argc,char** argv)
   else {
     // interactive mode
     UImanager->ApplyCommand("/control/execute init_vis.mac");
-    ui->SessionStart();
+    // ui->SessionStart();
     delete ui;
   }
 
@@ -148,9 +173,9 @@ int main(int argc,char** argv)
   // owned and deleted by the run manager, so they should not be deleted
   // in the main() program !
 
-  //anam->Save();
+  anam->Save();
+  delete anam;
 
-  //delete anam;
   //delete visManager;
   delete runManager;
   std::cout<<">>> simple_geom: end."<<std::endl;

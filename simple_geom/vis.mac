@@ -80,7 +80,7 @@
 /vis/set/textColour    # Revert to default text colour (blue)
 #
 # Axes, scale, etc.
-/vis/scene/add/scale   # Simple scale line
+#/vis/scene/add/scale   # Simple scale line
 #/vis/scene/add/axes    # Simple axes: x=red, y=green, z=blue.
 /vis/scene/add/eventID # Drawn at end of event
 /vis/scene/add/date    # Date stamp
@@ -108,6 +108,10 @@
 /vis/viewer/set/style surface
 /vis/viewer/set/hiddenMarker false
 /vis/viewer/set/viewpointThetaPhi 120 150
+/vis/viewer/set/projection p
+/vis/viewer/set/lightsVector -1 0 -1
+/vis/scene/add/axes -15 -15 -20
+/vis/viewer/set/background white
 #
 # Re-establish auto refreshing and verbosity:
 /vis/viewer/set/autoRefresh true

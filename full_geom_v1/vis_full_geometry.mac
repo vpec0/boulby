@@ -1,0 +1,42 @@
+############################################################
+### Deal with visualised geometry ##########################
+############################################################
+# To get nice view
+#
+/vis/viewer/set/viewpointVector 0.8 2 -0.2
+/vis/viewer/set/lightsVector -0.4 -1 0.4
+/vis/viewer/addCutawayPlane 0 0.2 0 m 0 -1 0
+#
+### Set Visibility ###
+# Make the "World" box invisible
+/vis/geometry/set/visibility World 0 false
+#/vis/geometry/set/visibility Rock 0 false
+# /vis/geometry/set/visibility Hall 0 false
+# /vis/geometry/set/visibility Steel 0 false
+# /vis/geometry/set/visibility WT 0 false
+# /vis/geometry/set/visibility GdLS 0 false
+# /vis/geometry/set/visibility OCV 0 false
+# /vis/geometry/set/visibility VAC 0 false
+# /vis/geometry/set/visibility ICV 0 false
+# /vis/geometry/set/visibility ID_ENV 0 false
+# /vis/geometry/set/visibility Dome 0 false
+# /vis/geometry/set/visibility Top_PMT 0 false
+# /vis/geometry/set/visibility Top_PTFE 0 false
+# /vis/geometry/set/visibility Skin 0 false
+# /vis/geometry/set/visibility TPC_ENV 0 false
+# /vis/geometry/set/visibility Side_PTFE 0 false
+# /vis/geometry/set/visibility TPC 0 false
+# /vis/geometry/set/visibility RFR 0 false
+# /vis/geometry/set/visibility Bottom_PTFE 0 false
+# /vis/geometry/set/visibility Bottom_PMT 0 false
+#
+/control/execute vis_colors.mac
+#
+#
+############################################################
+### Save the output
+############################################################
+#
+# /vis/ogl/set/printMode pixmap
+/vis/ogl/set/printFilename plots/full_geom_v0_full_view.svg
+/vis/ogl/export

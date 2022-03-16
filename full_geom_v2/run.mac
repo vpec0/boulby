@@ -1,0 +1,15 @@
+# Initialize kernel
+/run/initialize
+#
+/control/verbose 1
+/run/verbose 2
+/run/printProgress 100
+/event/verbose 0
+/tracking/verbose 0
+#
+#
+/gun/particle mu+
+/gun/energy 280 GeV
+#
+/run/beamOn 10000
+#

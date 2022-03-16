@@ -1,0 +1,68 @@
+
+int attachFiles(TChain* tree, const char* fname, int batchNo, int Nruns, int startrun, const char* basedir) {
+    size_t size = 0;
+
+    if (!strcmp(fname, "")) { // no input given
+        cout<<"Will add production files from batch "
+            <<batchNo<<" to the chain (unchecked)."<<endl;
+	cout<<"Will attempt to add "<<Nruns<<" runs, starting from "
+	    <<startrun<<endl;
+        TString batch = Form("%d", batchNo);
+        TString topdir = Form("%s/batch_", basedir);
+        topdir += batch + "/";
+	int success = 0;
+        for (int j = 0; j<Nruns; j++) {
+            TString fname = topdir +
+                Form("%d/sim.root", startrun + j + batchNo);
+            int status = tree->Add(fname, TTree::kMaxEntries);
+	    if (status) success++;
+        }
+	success = tree->GetNtrees();
+	tree->GetEntry(0);
+	size = tree->GetTree()->GetEntries();
+	if (success) size *= success;
+
+    } else { // input given
+
+        cout<<"Adding "<<fname<<" to the chain."<<endl;
+        int status = tree->Add(fname, -1);
+        if (!status) { // try to look in the base dir
+            tree->SetName("anatree");
+            status = tree->Add(fname, -1);
+        }
+        cout<<"Status: "<<status<<endl;
+	size = tree->GetEntries();
+    }
+
+    return size;
+}
+
+#ifndef FOR
+#define FOR(i, size) for (int i = 0; i < size; i++)
+#define UNDEFFOR
+#endif
+void doXlog(TH1* h, int which = 0)
+// redo scales for x-log hists
+{
+    TAxis* axis = (which==0)?h->GetXaxis():h->GetYaxis();
+
+    double start = TMath::Log10(axis->GetXmin());
+    double stop = TMath::Log10(axis->GetXmax());
+    double range = stop - start;
+    int nbins = axis->GetNbins();
+    double binwidth = range / nbins;
+
+    double *bins = new double[nbins+1];
+    FOR(i, (nbins+1)) {
+	bins[i] = TMath::Power(10, start + i*binwidth);
+    }
+
+    axis->Set(nbins, bins);
+
+    delete[] bins;
+}
+
+#ifdef UNDEFFOR
+#undef FOR
+#undef UNDEFFOR
+#endif

@@ -135,16 +135,6 @@ void AnaManager::Normalize(G4int ih, G4double fac)
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void AnaManager::FillNtuple(G4double energyAbs, G4double energyGap,
-                              G4double trackLAbs , G4double trackLGap )
-{
-  fEabs = energyAbs;
-  fEgap = energyGap;
-  fLabs = trackLAbs;
-  fLgap = trackLGap;
-
-  if (fTree) fTree->Fill();
-}
 
 
 void AnaManager::FillTree()

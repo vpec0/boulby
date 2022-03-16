@@ -1,33 +1,3 @@
-//
-// ********************************************************************
-// * License and Disclaimer                                           *
-// *                                                                  *
-// * The  Geant4 software  is  copyright of the Copyright Holders  of *
-// * the Geant4 Collaboration.  It is provided  under  the terms  and *
-// * conditions of the Geant4 Software License,  included in the file *
-// * LICENSE and available at  http://cern.ch/geant4/license .  These *
-// * include a list of copyright holders.                             *
-// *                                                                  *
-// * Neither the authors of this software system, nor their employing *
-// * institutes,nor the agencies providing financial support for this *
-// * work  make  any representation or  warranty, express or implied, *
-// * regarding  this  software system or assume any liability for its *
-// * use.  Please see the license in the file  LICENSE  and URL above *
-// * for the full disclaimer and the limitation of liability.         *
-// *                                                                  *
-// * This  code  implementation is the result of  the  scientific and *
-// * technical work of the GEANT4 collaboration.                      *
-// * By using,  copying,  modifying or  distributing the software (or *
-// * any work based  on the software)  you  agree  to acknowledge its *
-// * use  in  resulting  scientific  publications,  and indicate your *
-// * acceptance of all terms of the Geant4 Software license.          *
-// ********************************************************************
-//
-//
-//
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 #ifndef AnaManager_h
 #define AnaManager_h 1
 
@@ -37,6 +7,10 @@
 
 #include "AnaTree.h"
 
+#include <TH1F.h>
+
+//#define DEBUG
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 class TFile;
@@ -44,11 +18,26 @@ class TTree;
 class TH1D;
 
 const G4int kMaxHisto = 4;
+const G4int kMaxG4Tracks = 200000;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 class AnaManager
 {
+public:
+    enum {
+	kTpc=0,
+	kRfr,
+	kSkin,
+	kGdls,
+	kWt,
+	kNdetectors
+    };
+
+    const char* DetectorNames[kNdetectors] = {
+	"TPC", "RFR", "Skin", "Scint", "WT"
+    };
+
   public:
     AnaManager();
     AnaManager(const char*);
@@ -60,18 +49,29 @@ class AnaManager
     void FillHisto(G4int id, G4double bin, G4double weight = 1.0);
     void Normalize(G4int id, G4double fac);
 
-    void FillNtuple(G4double energyAbs, G4double energyGap,
-                    G4double trackLAbs, G4double trackLGap);
-
     void FillTree();
     void PrintStatistic();
     void Reset();
+
+    // setters and getters
+    // set or get energy deposit by EM or NonEM, and by detector
+    void SetEdep(Double_t, Double_t, Double_t, Double_t, Double_t, Int_t);
+    //Double_t* GetEdep(Int_t, Int_t);
+    void FillPDGEdep(Int_t detector, Int_t pdg, Double_t Edep) {
+	fHisto[detector]->Fill(Form("%d", pdg), Edep); }
+
+
+    void AddTrkPdg(G4int trkId, G4int pdg) { fTrkPdg[trkId] = pdg; }
+    G4int GetTrkPdg(G4int trkId) { return fTrkPdg[trkId]; }
+
+public:
+    static AnaManager* GetManager() {return fgManager;}
 
 
   private:
     TString  fFileName;
     TFile*   fRootFile;
-    TH1D*    fHisto[kMaxHisto];
+    TH1F*    fHisto[kNdetectors];
     TTree*   fTree;
 
 
@@ -80,9 +80,16 @@ class AnaManager
     G4double fLabs;
     G4double fLgap;
 
+    G4int fTrkPdg[kMaxG4Tracks];
+
+
 public:
-    AnaTree::Event_t mEvent;
-    int mWarningMessageCount;
+    AnaTree::Event_t fEvent;
+    int fWarningMessageCount;
+
+private:
+    static AnaManager* fgManager;
+
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

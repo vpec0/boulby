@@ -39,11 +39,17 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 ActionInitialization::ActionInitialization(DetectorConstruction* detconst,
-								   AnaManager* anam)
+					   G4String muon_file_name)
     : G4VUserActionInitialization(),
-      mAnaM(anam),
-      mDetConst(detconst)
-{}
+      mDetConst(detconst),
+      mMuonFileName(muon_file_name),
+      fStartEvent(0),
+      fNevents(0)
+{
+    if (!AnaManager::GetManager())
+	new AnaManager();
+    mAnaM = AnaManager::GetManager();
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -54,7 +60,7 @@ ActionInitialization::~ActionInitialization()
 
 void ActionInitialization::BuildForMaster() const
 {
-    RunAction* runAction = new RunAction(mAnaM);
+    RunAction* runAction = new RunAction();
   SetUserAction(runAction);
 }
 
@@ -62,18 +68,25 @@ void ActionInitialization::BuildForMaster() const
 
 void ActionInitialization::Build() const
 {
-  SetUserAction(new PrimaryGeneratorAction);
+    auto pga = new PrimaryGeneratorAction(mMuonFileName, fNevents, fStartEvent);
+    SetUserAction(pga);
+    if (fEventOffset)
+	pga->SetEventOffset(fEventOffset);
+    pga->ReadInMuonFile();
 
-  RunAction* runAction = new RunAction (mAnaM);
+    //SetUserAction(new PrimaryGeneratorAction()); // generate single neutron in the centre of the TPC
+
+  RunAction* runAction = new RunAction ();
   SetUserAction(runAction);
 
-  EventAction* eventAction = new EventAction(runAction, mAnaM);
+  EventAction* eventAction = new EventAction();
   SetUserAction(eventAction);
 
 
-  SetUserAction(new TrackingAction(mDetConst, mAnaM));
+  SetUserAction(new TrackingAction());
 
-  SetUserAction(new SteppingAction(eventAction));
+  // disable this. No need to use, will be using SensitiveDetector
+  // SetUserAction(new SteppingAction());
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
